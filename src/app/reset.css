@@ -1,0 +1,3 @@
+/* plain CSS only (no @tailwind) */
+html, body { background:#0A0F13 !important; color:#E7ECEF !important; }
+h1 { font-size: 32px; }
