@@ -1,15 +1,13 @@
 // naive in-memory rate limit per IP (OK for small sites / serverless cold starts)
-const hits = new Map<string, { count: number; ts: number }>();
+// src/lib/rate-limit.ts
+const buckets = new Map<string, number[]>();
 
-export function limit(ip: string, windowMs = 60_000, max = 20) {
+export function limit(key: string, windowMs: number, maxHits: number) {
   const now = Date.now();
-  const rec = hits.get(ip) ?? { count: 0, ts: now };
-  if (now - rec.ts > windowMs) {
-    rec.count = 0;
-    rec.ts = now;
-  }
-  rec.count++;
-  hits.set(ip, rec);
-  return rec.count <= max;
+  const hits = (buckets.get(key) ?? []).filter((t) => now - t < windowMs);
+  hits.push(now);
+  buckets.set(key, hits);
+  return hits.length <= maxHits;
 }
+
 
