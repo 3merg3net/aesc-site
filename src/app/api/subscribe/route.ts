@@ -1,12 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req) {
+type SubscribeBody = {
+  email?: string;
+  honey?: string;
+};
+
+export async function POST(req: NextRequest) {
   try {
-    const { email, honey } = await req.json();
+    const { email, honey } = (await req.json()) as SubscribeBody;
 
+    // honeypot
     if (honey) return NextResponse.json({ ok: true });
+
     if (!email) {
-      return NextResponse.json({ ok: false, error: "Email is required" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "Email is required" },
+        { status: 400 }
+      );
     }
 
     const apiKey = process.env.RESEND_API_KEY;
@@ -33,7 +43,10 @@ export async function POST(req) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Server error" },
+      { status: 500 }
+    );
   }
 }
 
