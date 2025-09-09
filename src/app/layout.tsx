@@ -1,57 +1,50 @@
-// src/app/layout.js
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+// src/app/layout.tsx
 import "./globals.css";
-import SEOOrg from "@/components/SEOOrg";
-import SkipLink from "@/components/SkipLink";
-import { inter } from "./fonts";
-<body className={`${inter.className} bg-aesc-bg text-aesc-text antialiased`}></body>
+import type { Metadata } from "next";
 
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+// If you have these, keep them; otherwise delete the import + element.
+// import SEOOrg from "@/components/SEOOrg";
+// import SkipLink from "@/components/SkipLink";
+import { inter } from "./fonts"; // ok if you don't have fonts.ts; remove both uses
 
-
-export const metadata = {
-  title: "ÆSC Trust",
-  description: "ÆSC Trust stewards the research, governance, and grants that advance the Æ law of conserved signal.",
-  metadataBase: new URL("https://aesctrust.org"), // change if your domain differs
+export const metadata: Metadata = {
+  title: { default: "ÆSC Trust", template: "%s | ÆSC" },
+  description:
+    "ÆSC Trust stewards the research, governance, and grants that advance the Æ law of conserved signal.",
+  metadataBase: new URL("https://aesctrust.org"),
   openGraph: {
     title: "ÆSC Trust",
-    description: "Stewarding conservation over consensus. Research, governance, grants.",
+    description:
+      "Stewarding conservation over consensus. Research, governance, grants.",
     url: "https://aesctrust.org",
     siteName: "ÆSC Trust",
-    images: [
-      {
-        url: "/aesctrust/og-default.png", // make a 1200x630 OG image
-        width: 1200,
-        height: 630,
-        alt: "ÆSC Trust",
-      },
-    ],
+    images: [{ url: "/aesctrust/og-default.png", width: 1200, height: 630, alt: "ÆSC Trust" }],
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "ÆSC Trust",
-    description: "Research, governance, and grants advancing the Æ law of conserved signal.",
+    description:
+      "Research, governance, and grants advancing the Æ law of conserved signal.",
     images: ["/aesctrust/og-default.png"],
   },
-  icons: {
-    icon: "/aesctrust/favicon-aesc.ico",
-  },
+  icons: { icon: "/aesctrust/favicon-aesc.ico" },
 };
 
-
-
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-aesc-bg text-aesc-text antialiased">
-         <SkipLink />
-  <Header />
-  {children}
-  <Footer />
-  <SEOOrg />
-</body>
+      <body className={`${inter?.className ?? ""} bg-aesc-bg text-aesc-text antialiased`}>
+        {/* <SkipLink /> */}
+        
+        <Header />
+        {children}
+        <Footer />
+        {/* <SEOOrg /> */}
+      </body>
     </html>
   );
 }

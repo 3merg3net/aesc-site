@@ -1,29 +1,22 @@
-// src/app/api/contact/route.js
 import { NextResponse } from "next/server";
 import { limit } from "../../../lib/rate-limit";
 
 export async function POST(req) {
-  const ip =
-    (req.headers.get("x-forwarded-for") || "").split(",")[0]?.trim() || "0";
+  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0]?.trim() || "0";
 
   // 10 requests/min per IP
   if (!limit(ip, 60_000, 10)) {
-    return NextResponse.json(
-      { ok: false, error: "Too many requests" },
-      { status: 429 }
-    );
+    return NextResponse.json({ ok: false, error: "Too many requests" }, { status: 429 });
   }
 
   try {
     const { name, email, company, phone, message, honey } = await req.json();
 
+    // Honeypot
     if (honey) return NextResponse.json({ ok: true });
 
     if (!name || !email || !message) {
-      return NextResponse.json(
-        { ok: false, error: "Missing required fields." },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: "Missing required fields." }, { status: 400 });
     }
 
     const apiKey = process.env.RESEND_API_KEY;
@@ -53,18 +46,16 @@ export async function POST(req) {
         }),
       });
     } else {
-      console.warn("Email disabled: set RESEND_API_KEY and CONTACT_TO");
+      console.warn("Email disabled: missing RESEND_API_KEY or CONTACT_TO");
     }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { ok: false, error: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
   }
 }
+
 
 
 
