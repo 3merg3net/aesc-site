@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import Banner from "@/components/Banner";
 import Divider from "@/components/Divider";
 import DividerGlyph from "@/components/DividerGlyph";
-import Hero from "@/components/Hero";
+
 
 export const metadata = {
   title: "ÆSC Trust — Law Over Consensus",
@@ -15,7 +16,7 @@ export default function HomePage() {
   return (
     <main>
       {/* Hero */}
-      <Hero />
+      <Banner src="/aesctrust/icon-512.png" alt="Source" />
       <section className="relative overflow-hidden">
         <Image
           src="/aesctrust/hero-bg-texture.png"

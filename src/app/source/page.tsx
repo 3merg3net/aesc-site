@@ -4,6 +4,7 @@ import Banner from "@/components/Banner";
 import Divider from "@/components/Divider";
 import DividerGlyph from "@/components/DividerGlyph";
 
+
 export const metadata = {
   title: "Source — ÆSC Trust",
   description:
@@ -23,7 +24,7 @@ export default function SourcePage() {
           alt=""
           fill
           priority
-          className="object-cover opacity-10 -z-10 pointer-events-none"
+          className="object-contain opacity-10 -z-10 pointer-events-none"
         />
 
         <div className="container relative">

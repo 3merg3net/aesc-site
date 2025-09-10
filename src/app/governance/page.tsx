@@ -3,6 +3,7 @@ import Banner from "@/components/Banner";
 import Divider from "@/components/Divider";
 import DividerGlyph from "@/components/DividerGlyph";
 
+
 export const metadata = {
   title: "Governance — ÆSC Trust",
   description:

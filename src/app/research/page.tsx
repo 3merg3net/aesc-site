@@ -3,6 +3,7 @@ import Banner from "@/components/Banner";
 import Divider from "@/components/Divider";
 import DividerGlyph from "@/components/DividerGlyph";
 
+
 export const metadata = {
   title: "Research — ÆSC Trust",
   description:
@@ -13,7 +14,7 @@ export const metadata = {
 export default function ResearchPage() {
   return (
     <main>
-      <Banner src="/aesctrust/research-banner.png" alt="Research" />
+<Banner src="/aesctrust/research-banner.png" alt="Research" />
 
       <section className="relative section">
         {/* subtle background */}

@@ -50,7 +50,7 @@ export default function Header() {
 
         {/* Desktop socials */}
         <div className="hidden md:flex items-center gap-2">
-          <Link aria-label="X (Twitter)" href="https://x.com/" target="_blank" className="rounded-xl2 ring-1 ring-white/15 p-2 hover:ring-white/30">
+          <Link aria-label="X (Twitter)" href="https://x.com/Aesctrust/" target="_blank" className="rounded-xl2 ring-1 ring-white/15 p-2 hover:ring-white/30">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-white/80">
               <path d="M18.244 2H21l-6.56 7.5L22 22h-6.9l-4.3-5.8L5.8 22H3l7.04-8.05L2 2h6.9l3.9 5.3L18.244 2Zm-2.4 18h2.1L8.3 4h-2.1l9.644 16Z"/>
             </svg>
