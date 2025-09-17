@@ -10,6 +10,7 @@ const links = [
   { href: "/grants", label: "Grants" },
   { href: "/governance", label: "Governance" },
   { href: "/ecosystem", label: "Ecosystem" },
+  { href: "/meshwork", label: "Meshwork" },
   { href: "/press", label: "Press" },
   { href: "/source", label: "Source" },
   { href: "/contact", label: "Contact" },
