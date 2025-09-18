@@ -34,18 +34,19 @@ export const metadata: Metadata = {
   icons: { icon: "/aesctrust/favicon-aesc.ico" },
 };
 
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter?.className ?? ""} bg-aesc-bg text-aesc-text antialiased`}>
-        {/* <SkipLink /> */}
-        
-        <Header />
-        {children}
-        <Footer />
-        {/* <SEOOrg /> */}
-      </body>
-    </html>
+  <body
+    className={`${inter?.className ?? ""} bg-aesc-bg text-aesc-text antialiased overflow-x-hidden`}
+  >
+    {/* <SkipLink /> */}
+    <Header />
+    {children}
+  </body>
+</html>
+
   );
 }
 
