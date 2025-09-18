@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'leaflet/dist/leaflet.css';
+
+
 /* TEMP: prove Tailwind compiles (a class we’ll use on the page) */
 .tw-ok { @apply h-8 bg-red-500; }
 
@@ -9,6 +12,179 @@
 .container { @apply mx-auto max-w-[1200px] px-5; }
 .section { @apply py-16 md:py-24; }
 .hairline { background:url("/aesctrust/nav-divider.png") center/cover no-repeat; height:1px; opacity:.5; }
+
+
+@keyframes mesh-pan {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: 600px 360px; }
+}
+@keyframes hero-float {
+  0%   { transform: translateY(0px) scale(1.01); }
+  50%  { transform: translateY(-6px) scale(1.015); }
+  100% { transform: translateY(0px) scale(1.01); }
+}
+@keyframes stars-drift {
+  0%   { transform: translateY(0px); opacity: .55; }
+  50%  { transform: translateY(-8px); opacity: .7; }
+  100% { transform: translateY(0px); opacity: .55; }
+}
+
+.animate-mesh-pan   { animation: mesh-pan 24s linear infinite; }
+.animate-hero-float { animation: hero-float 10s ease-in-out infinite; }
+.animate-stars-drift{ animation: stars-drift 18s ease-in-out infinite; }
+
+/* --- Meshwork header animations --- */
+@keyframes mesh-pan {
+  0%   { background-position: 0px 0px; }
+  50%  { background-position: 520px 240px; }
+  100% { background-position: 1040px 480px; }
+}
+@keyframes stars-drift {
+  0%   { transform: translateY(0px) scale(1.0); opacity: .75; }
+  50%  { transform: translateY(-10px) scale(1.015); opacity: .95; }
+  100% { transform: translateY(0px) scale(1.0); opacity: .75; }
+}
+@keyframes pulse-cloud {
+  0%   { transform: translate3d(0,0,0) scale(1.0); opacity:.55; filter: blur(0px); }
+  50%  { transform: translate3d(-12px,-8px,0) scale(1.03); opacity:.75; filter: blur(0.4px); }
+  100% { transform: translate3d(0,0,0) scale(1.0); opacity:.55; filter: blur(0px); }
+}
+@keyframes hue {
+  0%   { filter: hue-rotate(0deg) saturate(1.05); }
+  50%  { filter: hue-rotate(12deg) saturate(1.25); }
+  100% { filter: hue-rotate(0deg) saturate(1.05); }
+}
+@keyframes scan {
+  0%   { background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.06) 50%, rgba(255,255,255,0) 100%); background-size: 100% 6px; background-position: 0 0; }
+  100% { background-position: 0 6px; }
+}
+
+/* Glitch: quick sub-pixel jitters on the hero wrapper */
+@keyframes glitch {
+  0%   { transform: translate(0,0); opacity: 1; }
+  8%   { transform: translate(-0.5px,0.3px); }
+  16%  { transform: translate(0.6px,-0.4px); }
+  24%  { transform: translate(-0.4px,0.2px); }
+  32%  { transform: translate(0.3px,-0.6px); }
+  40%  { transform: translate(0,0); }
+  100% { transform: translate(0,0); }
+}
+
+/* Tailwind utility hooks */
+.animate-mesh-pan    { animation: mesh-pan 16s linear infinite; }
+.animate-stars-drift { animation: stars-drift 14s ease-in-out infinite; }
+.animate-pulse-cloud { animation: pulse-cloud 10s ease-in-out infinite; }
+.animate-hue         { animation: hue 12s ease-in-out infinite; }
+.animate-scan        { animation: scan 1.1s linear infinite; }
+
+/* Apply a gentle glitch to the hero container */
+.drift-glitch { animation: glitch 2.2s steps(12, end) infinite; }
+
+/* Improve GPU compositing */
+.will-change-transform { will-change: transform, opacity, filter; }
+
+/* ===== Meshwork POP Animations (single source of truth) ===== */
+
+/* header mesh grid + nodes */
+.mesh-canvas {
+  background-image:
+    linear-gradient(90deg, rgba(0,210,255,0.22) 1px, transparent 1px),
+    linear-gradient(0deg,  rgba(0,210,255,0.18) 1px, transparent 1px),
+    radial-gradient(circle at center, rgba(255,205,100,0.95) 0 2px, rgba(255,205,100,0) 3px);
+  background-size: 90px 90px, 90px 90px, 90px 90px; /* tighter grid for more detail */
+  background-position: 0 0, 0 0, 0 0;
+  mix-blend-mode: screen;
+  animation:
+    mesh-pan 10s linear infinite,
+    nodes-pulse 2.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(0,220,255,.25));
+  opacity: .95;  /* make it stronger */
+}
+
+/* faster pan + larger diagonal drift */
+@keyframes mesh-pan {
+  0%   { background-position: 0px 0px, 0px 0px, 0px 0px; }
+  50%  { background-position: 260px 160px, 130px 80px, 200px 130px; }
+  100% { background-position: 520px 320px, 260px 160px, 400px 260px; }
+}
+
+/* brighter node pulse */
+@keyframes nodes-pulse {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.6); }
+}
+
+/* star layer drift (stronger) */
+@keyframes stars-drift {
+  0%   { transform: translateY(0) scale(1.0); opacity:.85; }
+  50%  { transform: translateY(-16px) scale(1.03); opacity:1; }
+  100% { transform: translateY(0) scale(1.0); opacity:.85; }
+}
+.animate-stars-drift { animation: stars-drift 12s ease-in-out infinite; }
+
+/* hue swing for hero */
+@keyframes hue {
+  0%   { filter: hue-rotate(0deg) saturate(1.1); }
+  50%  { filter: hue-rotate(18deg) saturate(1.35); }
+  100% { filter: hue-rotate(0deg) saturate(1.1); }
+}
+.animate-hue { animation: hue 10s ease-in-out infinite; }
+
+/* micro-glitch jitter */
+@keyframes glitch {
+  0% { transform: translate(0,0); }
+  8% { transform: translate(-0.8px, 0.5px); }
+  16%{ transform: translate(0.9px,-0.6px); }
+  24%{ transform: translate(-0.6px,0.4px); }
+  32%{ transform: translate(0.5px,-0.9px); }
+  40%{ transform: translate(0,0); }
+  100%{ transform: translate(0,0); }
+}
+.drift-glitch { animation: glitch 1.8s steps(18,end) infinite; }
+
+/* scanline shimmer */
+@keyframes scan {
+  0%   { background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.09) 50%, rgba(255,255,255,0) 100%); background-size: 100% 6px; background-position: 0 0; }
+  100% { background-position: 0 6px; }
+}
+.animate-scan { animation: scan 1s linear infinite; }
+
+/* Optional: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .mesh-canvas,
+  .animate-stars-drift,
+  .animate-hue,
+  .drift-glitch,
+  .animate-scan { animation: none !important; }
+}
+
+
+/* ---- Global layout helpers ---- */
+@layer components {
+  /* Centered page container */
+  .container {
+    @apply mx-auto w-full max-w-6xl px-6;
+  }
+
+  /* Vertical rhythm for sections */
+  .section {
+    @apply py-12 md:py-16;
+  }
+
+  /* Full-bleed block that stays centered across the viewport */
+  .full-bleed {
+    width: 100vw;
+    max-width: none;
+    /* Tailwind arbitrary props: spaces become underscores */
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
+
+  /* Optional: wider container for media-heavy pages */
+  .container-wide {
+    @apply mx-auto w-full max-w-7xl px-6;
+  }
+}
 
 
 

@@ -1,6 +1,11 @@
 // app/meshwork/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
+import MeshworkHeader from "@/components/meshwork/MeshworkHeader";
+import LiveMap from "@/components/meshwork/LiveMap";
+import StatsBar from "@/components/meshwork/StatsBar";
+import RecentTicker from "@/components/meshwork/RecentTicker";
+import MapLegend from "@/components/meshwork/MapLegend";
 
 export const metadata: Metadata = {
   title: "ÆSC Meshwork — Build on the Phramework",
@@ -20,6 +25,7 @@ export default function MeshworkPage() {
 
   return (
     <main className="min-h-screen bg-[#0B0F14] text-zinc-100">
+         <MeshworkHeader />
       {/* HERO (matches Research: compact subtitle, bold H1, subdued paragraph) */}
       <header className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
@@ -86,12 +92,18 @@ export default function MeshworkPage() {
                 <p className="mt-2 text-sm text-zinc-300">{s.d}</p>
               </li>
             ))}
+            <LiveMap fullBleed heightClass="h-[70vh]" />
+            
+            
           </ol>
           <p className="mt-5 text-sm text-zinc-400">
             Start small (e.g., C96 periodic budgets) and expand over time.
           </p>
+          <StatsBar />
+          <RecentTicker />
         </div>
       </section>
+      
 
       <section id="contracts" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
@@ -201,6 +213,7 @@ for msg in subscribe("mesh.ping"):
           </div>
         </div>
       </section>
+       
 
       <section id="examples" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
@@ -215,8 +228,11 @@ for msg in subscribe("mesh.ping"):
                 <h3 className="font-medium">{x.t}</h3>
                 <p className="mt-2 text-sm text-zinc-300">{x.d}</p>
               </div>
+              
+              
             ))}
           </div>
+          
 
           <div className="mt-8">
             <Link href="/ecosystem" className="inline-block rounded-xl border border-white/10 px-4 py-2 text-sm hover:bg-white/5">
