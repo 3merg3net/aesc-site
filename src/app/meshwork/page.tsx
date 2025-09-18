@@ -2,10 +2,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import MeshworkHeader from "@/components/meshwork/MeshworkHeader";
-import LiveMap from "@/components/meshwork/LiveMap";
 import StatsBar from "@/components/meshwork/StatsBar";
 import RecentTicker from "@/components/meshwork/RecentTicker";
-import MapLegend from "@/components/meshwork/MapLegend";
+import LiveMapClient from "@/components/meshwork/LiveMapClient"; // ← client-only wrapper
 
 export const metadata: Metadata = {
   title: "ÆSC Meshwork — Build on the Phramework",
@@ -25,8 +24,9 @@ export default function MeshworkPage() {
 
   return (
     <main className="min-h-screen bg-[#0B0F14] text-zinc-100">
-         <MeshworkHeader />
-      {/* HERO (matches Research: compact subtitle, bold H1, subdued paragraph) */}
+      <MeshworkHeader />
+
+      {/* HERO */}
       <header className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
           <p className="text-[11px] tracking-[0.18em] text-teal-300/80">FOUNDATION • DEVELOPERS</p>
@@ -38,7 +38,7 @@ export default function MeshworkPage() {
             that conserve, resonate, and self-correct.
           </p>
 
-          {/* Local section nav (same understated link style as Research) */}
+          {/* Local section nav */}
           <nav className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-400">
             {sections.map((s) => (
               <a key={s.id} href={`#${s.id}`} className="hover:text-zinc-200 underline-offset-4 hover:underline">
@@ -49,7 +49,7 @@ export default function MeshworkPage() {
         </div>
       </header>
 
-      {/* SECTION TEMPLATE: title + dense cards + bottom divider */}
+      {/* QUICKSTART */}
       <section id="quickstart" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <h2 className="text-xl md:text-2xl font-semibold">Quickstart (3 steps)</h2>
@@ -92,19 +92,23 @@ export default function MeshworkPage() {
                 <p className="mt-2 text-sm text-zinc-300">{s.d}</p>
               </li>
             ))}
-            <LiveMap fullBleed heightClass="h-[70vh]" />
-            
-            
           </ol>
+
           <p className="mt-5 text-sm text-zinc-400">
             Start small (e.g., C96 periodic budgets) and expand over time.
           </p>
+
           <StatsBar />
           <RecentTicker />
         </div>
       </section>
-      
 
+      {/* FULL-BLEED LIVE MAP (client-only) */}
+      <section className="full-bleed">
+        <LiveMapClient heightClass="h-[70vh]" />
+      </section>
+
+      {/* CONTRACTS */}
       <section id="contracts" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <h2 className="text-xl md:text-2xl font-semibold">Contracts (Base L2)</h2>
@@ -138,6 +142,7 @@ export default function MeshworkPage() {
         </div>
       </section>
 
+      {/* API */}
       <section id="api" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <h2 className="text-xl md:text-2xl font-semibold">APIs & Event Channels</h2>
@@ -169,6 +174,7 @@ export default function MeshworkPage() {
         </div>
       </section>
 
+      {/* SDKS */}
       <section id="sdks" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <h2 className="text-xl md:text-2xl font-semibold">SDKs</h2>
@@ -194,6 +200,7 @@ for msg in subscribe("mesh.ping"):
         </div>
       </section>
 
+      {/* ARCHETYPES */}
       <section id="archetypes" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <h2 className="text-xl md:text-2xl font-semibold">Archetypes (Nature + Cosmic)</h2>
@@ -213,8 +220,8 @@ for msg in subscribe("mesh.ping"):
           </div>
         </div>
       </section>
-       
 
+      {/* EXAMPLES */}
       <section id="examples" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <h2 className="text-xl md:text-2xl font-semibold">Examples</h2>
@@ -228,11 +235,8 @@ for msg in subscribe("mesh.ping"):
                 <h3 className="font-medium">{x.t}</h3>
                 <p className="mt-2 text-sm text-zinc-300">{x.d}</p>
               </div>
-              
-              
             ))}
           </div>
-          
 
           <div className="mt-8">
             <Link href="/ecosystem" className="inline-block rounded-xl border border-white/10 px-4 py-2 text-sm hover:bg-white/5">
@@ -266,3 +270,4 @@ for msg in subscribe("mesh.ping"):
     </main>
   );
 }
+

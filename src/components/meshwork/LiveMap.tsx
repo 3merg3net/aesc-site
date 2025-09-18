@@ -1,6 +1,7 @@
 "use client";
 
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
+import type { LatLngTuple } from "leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /** Optional props so you can reuse this anywhere */
@@ -23,7 +24,9 @@ export default function LiveMap({ fullBleed = true, heightClass = "h-[60vh]" }: 
   const [nodes, setNodes] = useState<NodeRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const pollId = useRef<number | null>(null);
-  const center = useMemo<[number, number]>(() => [20, 0], []);
+
+  // Use Leaflet's tuple type so TS knows this is valid for `center`
+  const center = useMemo<LatLngTuple>(() => [20, 0], []);
 
   // React-Leaflet safety
   useEffect(() => setMounted(true), []);
@@ -93,7 +96,7 @@ export default function LiveMap({ fullBleed = true, heightClass = "h-[60vh]" }: 
   };
   const short = (id: string) => (id && id.length > 12 ? `${id.slice(0, 6)}…${id.slice(-4)}` : id ?? "");
 
-  // Full-bleed wrapper (centered): use arbitrary properties with spaces encoded as underscores
+  // Full-bleed wrapper (centered): spaces must be underscores in Tailwind arbitrary props
   const outerClass = fullBleed
     ? "relative w-screen max-w-none [margin-left:calc(50%_-_50vw)] [margin-right:calc(50%_-_50vw)]"
     : "relative w-full";
@@ -123,10 +126,10 @@ export default function LiveMap({ fullBleed = true, heightClass = "h-[60vh]" }: 
         <MapContainer
           center={center}
           zoom={2}
-          scrollWheelZoom
+          scrollWheelZoom={true}
           className="h-full w-full"
-          preferCanvas
-          worldCopyJump
+          preferCanvas={true}
+          worldCopyJump={true}
         >
           <TileLayer
             // Dark basemap for contrast; swap if you prefer
@@ -184,5 +187,6 @@ function Legend() {
     </div>
   );
 }
+
 
 
