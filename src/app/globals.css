@@ -9,8 +9,9 @@
 .tw-ok { @apply h-8 bg-red-500; }
 
 /* your helpers (used later) */
-.container { @apply mx-auto max-w-[1200px] px-5; }
-.section { @apply py-16 md:py-24; }
+.container { @apply mx-auto max-w-[1200px] px-6; }
+.section { @apply py-12 md:py-16; }
+
 .hairline { background:url("/aesctrust/nav-divider.png") center/cover no-repeat; height:1px; opacity:.5; }
 
 
@@ -184,6 +185,14 @@
   .container-wide {
     @apply mx-auto w-full max-w-7xl px-6;
   }
+
+  /* globals.css */
+figure img, .prose img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
 }
 
 

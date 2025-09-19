@@ -25,8 +25,8 @@ export default function Footer() {
       </div>
 
       {/* Main footer grid */}
-      <div className="container py-12 grid md:grid-cols-3 gap-8">
-        {/* About */}
+      <div className="container py-12 grid gap-8 md:grid-cols-4">
+        {/* About + Powered by AESC */}
         <div>
           <div className="flex items-center gap-3">
             <Image src="/aesctrust/logo-symbol.png" alt="ÆSC" width={22} height={22} className="opacity-90" />
@@ -35,9 +35,19 @@ export default function Footer() {
           <p className="mt-3 text-sm text-aesc-sub max-w-sm">
             Stewarding the law of conserved signal — research, open standards, and applied ecosystems.
           </p>
+          <div className="mt-5">
+            <Image
+              src="/meshwork/powered-by-aesc.png"
+              alt="Powered by AESC"
+              width={220}
+              height={64}
+              className="opacity-90"
+              priority={false}
+            />
+          </div>
         </div>
 
-        {/* Explore with glyph bullets */}
+        {/* Explore with glyph bullets (existing) */}
         <nav aria-label="Footer" className="text-sm">
           <h3 className="text-white/80 font-semibold">Explore</h3>
           <ul className="mt-3 space-y-2">
@@ -52,9 +62,40 @@ export default function Footer() {
           </ul>
         </nav>
 
-        {/* Attribution + socials */}
+        {/* NEW: Meshwork quick links */}
+        <nav aria-label="Meshwork" className="text-sm">
+          <h3 className="text-white/80 font-semibold">Meshwork</h3>
+          <ul className="mt-3 space-y-2">
+            <li>
+              <Link href="/meshwork" className="inline-flex items-center gap-2 text-aesc-sub hover:text-white">
+                
+                Overview
+              </Link>
+            </li>
+            <li>
+              <Link href="/meshwork/getting-started" className="inline-flex items-center gap-2 text-aesc-sub hover:text-white">
+                
+                Getting Started
+              </Link>
+            </li>
+            <li>
+              <Link href="/meshwork#map" className="inline-flex items-center gap-2 text-aesc-sub hover:text-white">
+                
+                Live Map
+              </Link>
+            </li>
+            <li>
+              <Link href="/api/nodes" className="inline-flex items-center gap-2 text-aesc-sub hover:text-white">
+                <span className="inline-block h-2 w-2 rounded-full bg-teal-300/90" />
+                View JSON
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Attribution + socials (existing) */}
         <div className="flex flex-col items-end gap-4 text-sm text-aesc-sub">
-          <div>
+          <div className="text-right">
             Mathematics by{" "}
             <a className="underline hover:text-white" href="https://www.uor.foundation" target="_blank">
               UOR Foundation
@@ -86,6 +127,7 @@ export default function Footer() {
     </footer>
   );
 }
+
 
 
 

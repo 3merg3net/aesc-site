@@ -12,49 +12,55 @@ export default function GettingStartedHeader({ variant = "compact" }: Props) {
   const showText = variant === "full";
 
   return (
-    <header className={showText
-      ? "relative overflow-hidden h-[48vh] min-h-[340px] md:h-[56vh]"
-      : "relative overflow-hidden h-[32vh] min-h-[220px] md:h-[36vh]"}>
-      {/* Gradient base */}
+    <header
+      className={
+        showText
+          ? "relative overflow-hidden h-[48vh] min-h-[340px] md:h-[56vh]"
+          : "relative overflow-hidden h-[32vh] min-h-[220px] md:h-[36vh]"
+      }
+    >
+      {/* 1) Gradient base */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(70%_90%_at_50%_15%,#0b1e34_0%,#081627_45%,#030a14_100%)]" />
 
-      {/* Mesh grid */}
-      <div className="mesh-canvas absolute inset-0 z-10 opacity-90" />
+      {/* 2) Mesh grid (lines + nodes) */}
+      <div className="mesh-canvas absolute inset-0 z-10 will-change-transform" />
 
-      {/* Stars */}
-      <div
-        className="absolute inset-0 z-20 animate-stars-drift pointer-events-none"
-        style={{
-          backgroundImage: "url(/meshwork/meshwork-stars.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.8,
-        }}
-      />
-
-      {/* Hero art */}
-      <div className="absolute inset-0 z-30">
-        <div className="absolute inset-0 animate-hue drift-glitch">
+      {/* 3) Hero art (below stars so stars glow over it) */}
+      <div className="absolute inset-0 z-20">
+        <div className="absolute inset-0 animate-hue drift-glitch will-change-transform">
           <Image
-            src="/meshwork/meshwork-hero-alt.png"
-            alt="Meshwork"
+            src="/meshwork/meshwork-hero.png"
+            alt="Meshwork network"
             fill
             sizes="100vw"
             priority
-            className="object-cover object-center pointer-events-none select-none mix-blend-lighten opacity-80"
+            className="object-cover object-center pointer-events-none select-none mix-blend-screen opacity-85"
           />
         </div>
       </div>
 
-      {/* Optional text/CTA (only in "full" variant) */}
+      {/* 4) Stars (now ABOVE hero) */}
+      <div
+        className="absolute inset-0 z-30 animate-stars-drift pointer-events-none will-change-transform"
+        style={{
+          backgroundImage: "url(/meshwork/meshwork-stars.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.95,
+          mixBlendMode: "lighten",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 5) Optional text/CTA (only in 'full' variant) */}
       {showText && (
-        <div className="relative z-50 h-full flex items-center">
+        <div className="relative z-40 h-full flex items-center">
           <div className="mx-auto w-full max-w-4xl px-6 text-center">
             <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white drop-shadow-[0_6px_32px_rgba(24,166,255,.5)]">
               Getting Started with Meshwork
             </h1>
             <p className="mt-3 text-slate-200/90">
-              Learn how to spin up a node, send your first ping, and see it live on the mesh.
+              Spin up a node, send your first signed ping, and watch it light up the mesh.
             </p>
             <div className="mt-6 flex justify-center gap-3">
               <Link
@@ -74,9 +80,10 @@ export default function GettingStartedHeader({ variant = "compact" }: Props) {
         </div>
       )}
 
-      {/* Scanline overlay */}
+      {/* 6) Scanline overlay */}
       <div className="absolute inset-0 z-[60] pointer-events-none animate-scan mix-blend-overlay opacity-20" />
     </header>
   );
 }
+
 
