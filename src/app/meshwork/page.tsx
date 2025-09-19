@@ -5,8 +5,8 @@ import Image from "next/image";
 import MeshworkHeader from "@/components/meshwork/MeshworkHeader";
 import StatsBar from "@/components/meshwork/StatsBar";
 import RecentTicker from "@/components/meshwork/RecentTicker";
-import LiveMap from "@/components/meshwork/LiveMap";
 import Infographic from "@/components/meshwork/Infographic";
+import ClientLiveMap from "@/components/meshwork/ClientLiveMap"; 
 
 export const metadata: Metadata = {
   title: "ÆSC Meshwork — Build on the Phramework",
@@ -80,7 +80,7 @@ export default function MeshworkPage() {
             across the globe.
           </p>
           <div className="mt-6">
-            <LiveMap fullBleed heightClass="h-[70vh]" />
+             <ClientLiveMap fullBleed heightClass="h-[70vh]" />
           </div>
         </div>
       </section>
