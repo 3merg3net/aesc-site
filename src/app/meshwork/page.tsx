@@ -1,10 +1,12 @@
+// src/app/meshwork/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import MeshworkHeader from "@/components/meshwork/MeshworkHeader";
 import StatsBar from "@/components/meshwork/StatsBar";
 import RecentTicker from "@/components/meshwork/RecentTicker";
-import LiveMap from "@/components/meshwork/LiveMap";
+// ⬇️ CHANGE: use the client-wrapped map
+import LiveMapClient from "@/components/meshwork/LiveMapClient";
 
 export const metadata: Metadata = {
   title: "ÆSC Meshwork — Build on the Phramework",
@@ -56,18 +58,17 @@ export default function MeshworkPage() {
       {/* QUICKSTART */}
       <section id="quickstart" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
-         <div className="flex items-center gap-4">
-  <h2 className="text-xl md:text-2xl font-semibold">Quickstart (3 steps)</h2>
-  <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-    <Image
-      src="/meshwork/divider-quickstart.svg"
-      alt="Quickstart divider"
-      fill
-      className="object-contain opacity-80"
-    />
-  </div>
-</div>
-
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl md:text-2xl font-semibold">Quickstart (3 steps)</h2>
+            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
+              <Image
+                src="/meshwork/divider-quickstart.svg"
+                alt="Quickstart divider"
+                fill
+                className="object-contain opacity-80"
+              />
+            </div>
+          </div>
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-400">
             Spin up a node in minutes. Every participant strengthens the Meshwork by posting
@@ -88,9 +89,9 @@ export default function MeshworkPage() {
           </div>
         </div>
       </section>
-       <RecentTicker />
+
+      <RecentTicker />
       <StatsBar />
-      
 
       {/* LIVE MAP */}
       <section id="map" className="border-b border-white/10">
@@ -100,26 +101,25 @@ export default function MeshworkPage() {
             Each glowing point is a node posting verified threads—proof of presence across the globe.
           </p>
           <div className="mt-6">
-            <LiveMap fullBleed heightClass="h-[70vh]" />
+            {/* ⬇️ CHANGE: use client map wrapper */}
+            <LiveMapClient fullBleed heightClass="h-[70vh]" />
           </div>
         </div>
       </section>
-     
 
       {/* CONTRACTS */}
       <section id="contracts" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <div className="flex items-center gap-4">
             <h2 className="text-xl md:text-2xl font-semibold">Contracts (Base L2)</h2>
-           <div className="relative h-[60px] w-full max-w-4xl">
-  <Image
-    src="/meshwork/divider-contracts.svg"
-    alt="Contracts divider"
-    fill
-    className="object-cover opacity-80"
-  />
-</div>
-
+            <div className="relative h-[60px] w-full max-w-4xl">
+              <Image
+                src="/meshwork/divider-contracts.svg"
+                alt="Contracts divider"
+                fill
+                className="object-cover opacity-80"
+              />
+            </div>
           </div>
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
@@ -187,23 +187,21 @@ export default function MeshworkPage() {
           </div>
         </div>
       </section>
-      
 
       {/* APIs & EVENTS */}
       <section id="api" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <div className="flex items-center gap-4">
-  <h2 className="text-xl md:text-2xl font-semibold">APIs &amp; Event Channels</h2>
-  <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-    <Image
-      src="/meshwork/divider-apis.svg"
-      alt="APIs divider"
-      fill
-      className="object-cover opacity-80"
-    />
-  </div>
-</div>
-
+            <h2 className="text-xl md:text-2xl font-semibold">APIs &amp; Event Channels</h2>
+            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
+              <Image
+                src="/meshwork/divider-apis.svg"
+                alt="APIs divider"
+                fill
+                className="object-cover opacity-80"
+              />
+            </div>
+          </div>
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
             Use REST for simple reads and writes, or subscribe to event streams for real-time workflows.
@@ -258,17 +256,16 @@ export default function MeshworkPage() {
       <section id="sdks" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <div className="flex items-center gap-4">
-  <h2 className="text-xl md:text-2xl font-semibold">SDKs</h2>
-  <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-    <Image
-      src="/meshwork/divider-sdks.svg"
-      alt="SDKs divider"
-      fill
-      className="object-cover opacity-80"
-    />
-  </div>
-</div>
-
+            <h2 className="text-xl md:text-2xl font-semibold">SDKs</h2>
+            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
+              <Image
+                src="/meshwork/divider-sdks.svg"
+                alt="SDKs divider"
+                fill
+                className="object-cover opacity-80"
+              />
+            </div>
+          </div>
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
             SDKs make Meshwork integration straightforward. Use <strong>TypeScript</strong> for apps and dashboards,
@@ -324,17 +321,16 @@ mesh.ping(**msg, sig=sig, lat=37.78, lon=-122.41)`}
       <section id="archetypes" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <div className="flex items-center gap-4">
-  <h2 className="text-xl md:text-2xl font-semibold">Archetypes</h2>
-  <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-    <Image
-      src="/meshwork/divider-archetypes.svg"
-      alt="Archetypes divider"
-      fill
-      className="object-cover opacity-80"
-    />
-  </div>
-</div>
-
+            <h2 className="text-xl md:text-2xl font-semibold">Archetypes</h2>
+            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
+              <Image
+                src="/meshwork/divider-archetypes.svg"
+                alt="Archetypes divider"
+                fill
+                className="object-cover opacity-80"
+              />
+            </div>
+          </div>
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
             Archetypes give symbolic shape to Meshwork design. Each maps to a practical concern in systems
@@ -362,17 +358,16 @@ mesh.ping(**msg, sig=sig, lat=37.78, lon=-122.41)`}
       <section id="examples" className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
           <div className="flex items-center gap-4">
-  <h2 className="text-xl md:text-2xl font-semibold">Examples</h2>
-  <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-    <Image
-      src="/meshwork/divider-examples.svg"
-      alt="Examples divider"
-      fill
-      className="object-cover opacity-80"
-    />
-  </div>
-</div>
-
+            <h2 className="text-xl md:text-2xl font-semibold">Examples</h2>
+            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
+              <Image
+                src="/meshwork/divider-examples.svg"
+                alt="Examples divider"
+                fill
+                className="object-cover opacity-80"
+              />
+            </div>
+          </div>
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
             A few starting points that demonstrate how teams can build with Meshwork—from live presence
@@ -422,18 +417,12 @@ mesh.ping(**msg, sig=sig, lat=37.78, lon=-122.41)`}
               Get Started
             </Link>
           </div>
-
-          <div className="mt-10">
-            
-            <div className="mt-6">
-              
-            </div>
-          </div>
         </div>
       </section>
     </main>
   );
 }
+
 
 
 
