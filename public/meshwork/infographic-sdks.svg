@@ -1,0 +1,58 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#0B0F14"></rect>
+  <rect x="64" y="64" width="1472" height="772" rx="24" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="2"></rect>
+
+  <text x="96" y="140" fill="#B8FFF7" font-family="Inter" font-weight="600" font-size="42">SDKs — integrate signed threads fast</text>
+  <text x="96" y="182" fill="rgba(255,255,255,.65)" font-family="Inter" font-size="18">
+    TypeScript for apps &amp; dashboards • Python for data pipelines &amp; analytics.
+  </text>
+
+  <!-- TS card -->
+  <g transform="translate(96,240)">
+    <rect width="680" height="520" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+    <text x="20" y="44" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="22">@aesc/mesh (TypeScript)</text>
+    <rect x="20" y="70" width="640" height="410" rx="12" fill="#0A0F15" stroke="rgba(255,255,255,.06)"></rect>
+    <text x="36" y="100" fill="#BFEFFF" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="14">
+      import {"{"} MeshClient, signThread {"}"} from "@aesc/mesh";
+    </text>
+    <text x="36" y="126" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      const mesh = new MeshClient({"{"} baseUrl: "https://aesctrust.org/api" {"}"});
+    </text>
+    <text x="36" y="154" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      const msg = {"{"} nodeId, ts: Date.now(), nonce: crypto.randomUUID() {"}"};
+    </text>
+    <text x="36" y="180" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      const sig = await signThread(SECRET, msg);
+    </text>
+    <text x="36" y="206" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      await mesh.sendThread({"{"} ...msg, sig, lat: 40.7, lon: -74.0 {"}"});
+    </text>
+    <!-- thread line -->
+    <path d="M40 350 C 180 300, 360 410, 640 350" fill="none" stroke="#22D3EE" stroke-width="2"></path>
+    <circle cx="180" cy="318" r="3" fill="#22D3EE"></circle><circle cx="360" cy="382" r="3" fill="#22D3EE"></circle><circle cx="540" cy="340" r="3" fill="#22D3EE"></circle>
+  </g>
+
+  <!-- Python card -->
+  <g transform="translate(816,240)">
+    <rect width="680" height="520" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+    <text x="20" y="44" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="22">aesc-mesh (Python)</text>
+    <rect x="20" y="70" width="640" height="410" rx="12" fill="#0A0F15" stroke="rgba(255,255,255,.06)"></rect>
+    <text x="36" y="100" fill="#BFEFFF" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="14">
+      from aesc_mesh import Mesh, sign_thread
+    </text>
+    <text x="36" y="126" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      mesh = Mesh(base_url="https://aesctrust.org/api")
+    </text>
+    <text x="36" y="152" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      msg  = {"{"}"nodeId": NODE_ID, "ts": now_ms(), "nonce": rand_hex(){"}"}
+    </text>
+    <text x="36" y="178" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      sig  = sign_thread(SECRET, msg)
+    </text>
+    <text x="36" y="204" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      mesh.thread(**msg, sig=sig, lat=37.78, lon=-122.41)
+    </text>
+    <path d="M40 350 C 180 300, 360 410, 640 350" fill="none" stroke="#22D3EE" stroke-width="2"></path>
+    <circle cx="200" cy="320" r="3" fill="#22D3EE"></circle><circle cx="420" cy="380" r="3" fill="#22D3EE"></circle><circle cx="560" cy="340" r="3" fill="#22D3EE"></circle>
+  </g>
+</svg>

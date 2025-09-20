@@ -1,0 +1,95 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Contracts (Base L2)</title>
+  <desc>ÆSC Meshwork contracts card: Base L2 anchor, NodeRegistry, AnchorNode, event-first design</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B0F14"></stop>
+      <stop offset="1" stop-color="#070B10"></stop>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#16B9FF" stop-opacity="0.25"></stop>
+      <stop offset="1" stop-color="#16B9FF" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"></feGaussianBlur>
+    </filter>
+    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22D3EE"></stop>
+      <stop offset="1" stop-color="#7DD3FC"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="630" fill="url(#bg)"></rect>
+  <rect width="1200" height="630" fill="url(#glow)"></rect>
+
+  <!-- mesh accent grid -->
+  <g opacity="0.18" stroke="#1E293B">
+    <path d="M140 120 H1060"></path>
+    <path d="M140 200 H1060"></path>
+    <path d="M140 280 H1060"></path>
+    <path d="M140 360 H1060"></path>
+    <path d="M140 440 H1060"></path>
+    <path d="M140 520 H1060"></path>
+    <path d="M220 60 V570"></path>
+    <path d="M380 60 V570"></path>
+    <path d="M540 60 V570"></path>
+    <path d="M700 60 V570"></path>
+    <path d="M860 60 V570"></path>
+    <path d="M1020 60 V570"></path>
+  </g>
+
+  <!-- meshwork glyph (triangle + node) -->
+  <g transform="translate(950,86)">
+    <g filter="url(#soft)" opacity="0.45">
+      <circle cx="40" cy="40" r="28" fill="#22D3EE"></circle>
+    </g>
+    <polygon points="40,2 76,64 4,64" fill="none" stroke="url(#stroke)" stroke-width="2"></polygon>
+    <circle cx="40" cy="40" r="10" fill="#0B0F14" stroke="#22D3EE" stroke-width="2"></circle>
+    <circle cx="40" cy="40" r="3" fill="#22D3EE"></circle>
+  </g>
+
+  <!-- heading -->
+  <text x="140" y="160" fill="#E6F3FF" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" font-size="42" font-weight="700">
+    Contracts (Base L2)
+  </text>
+  <text x="140" y="198" fill="#9FB7C8" font-family="Inter, system-ui" font-size="18">
+    Minimal, event-first contracts that anchor the Meshwork on Base.
+  </text>
+
+  <!-- two cards -->
+  <g>
+    <!-- NodeRegistry -->
+    <rect x="140" y="240" width="430" height="260" rx="16" fill="#0E141B" stroke="rgba(255,255,255,0.08)"></rect>
+    <text x="170" y="284" fill="#E6F3FF" font-family="Inter, system-ui" font-size="22" font-weight="600">NodeRegistry</text>
+    <text x="170" y="314" fill="#A9BDC9" font-family="Inter, system-ui" font-size="16">
+      Canonical mapping of nodeId → metadata. Emits buildable events.
+    </text>
+    <g fill="#A9BDC9" font-family="Inter, system-ui" font-size="15">
+      <text x="170" y="350">• Events: <tspan fill="#D4F1FF">NodeRegistered</tspan>, <tspan fill="#D4F1FF">NodeUpdated</tspan></text>
+      <text x="170" y="378">• Optional geo hash, display name, URL</text>
+      <text x="170" y="406">• Separation of identity vs. activity</text>
+      <text x="170" y="434">• Upgradeable via proxy</text>
+    </g>
+  </g>
+
+  <g>
+    <!-- AnchorNode -->
+    <rect x="630" y="240" width="430" height="260" rx="16" fill="#0E141B" stroke="rgba(255,255,255,0.08)"></rect>
+    <text x="660" y="284" fill="#E6F3FF" font-family="Inter, system-ui" font-size="22" font-weight="600">AnchorNode (optional)</text>
+    <text x="660" y="314" fill="#A9BDC9" font-family="Inter, system-ui" font-size="16">
+      For special sites (sacred/civic). Encodes epoch, sigil, witnesses.
+    </text>
+    <g fill="#A9BDC9" font-family="Inter, system-ui" font-size="15">
+      <text x="660" y="350">• Events: <tspan fill="#D4F1FF">PlacementAttested</tspan>, <tspan fill="#D4F1FF">AnchorLinked</tspan></text>
+      <text x="660" y="378">• Off-chain proofs + on-chain references</text>
+      <text x="660" y="406">• Composable with dashboards/indexers</text>
+      <text x="660" y="434">• Clear jurisdictional hand-off</text>
+    </g>
+  </g>
+
+  <!-- footer note -->
+  <text x="140" y="540" fill="#88A7B7" font-family="Inter, system-ui" font-size="14">
+    Design principles: minimal surface area • event-first • composable • Base-first • chain-agnostic patterns
+  </text>
+</svg>

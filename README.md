@@ -3,7 +3,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## ⚡ Meshwork
 
 Meshwork is the live network visualization inside ÆSC Trust.  
-It shows digital nodes sending signed pings and appearing on a real-time map.
+It shows digital nodes sending signed threads and appearing on a real-time map.
 
 ### 🚀 Features
 - **Animated Header** with glitch + mesh grid background
@@ -24,3 +24,16 @@ npm install
 
 # run dev server
 npm run dev
+
+
+public/meshwork/
+  meshwork-hero.png
+  meshwork-hero-alt.png
+  meshwork-stars.png
+  meshwork-tile.png
+  meshwork-logo.png
+  infographic-getting-started.png
+  infographic-ping-lifecycle.png
+  infographic-mesh-growth.png
+  infographic-why-mesh.png
+  infographic-future-expansion.png

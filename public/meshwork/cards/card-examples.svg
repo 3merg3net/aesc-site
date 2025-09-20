@@ -1,0 +1,88 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Examples — Meshwork</title>
+  <desc>Three example tiles: Live Node Map, Generative Ritual, C96 Budget Pilot</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B0F14"></stop>
+      <stop offset="1" stop-color="#070B10"></stop>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#16B9FF" stop-opacity="0.25"></stop>
+      <stop offset="1" stop-color="#16B9FF" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16"></feGaussianBlur>
+    </filter>
+    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22D3EE"></stop>
+      <stop offset="1" stop-color="#7DD3FC"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="630" fill="url(#bg)"></rect>
+  <rect width="1200" height="630" fill="url(#glow)"></rect>
+
+  <!-- heading -->
+  <text x="140" y="140" fill="#E6F3FF" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" font-size="42" font-weight="700">
+    Examples
+  </text>
+  <text x="140" y="178" fill="#9FB7C8" font-family="Inter, system-ui" font-size="18">
+    Build presence maps, generative rituals, and C96-aligned budgets with the Meshwork.
+  </text>
+
+  <!-- three tiles -->
+  <!-- Tile 1: Live Node Map -->
+  <g transform="translate(140,220)">
+    <rect width="300" height="300" rx="16" fill="#0E141B" stroke="rgba(255,255,255,0.08)"></rect>
+    <!-- starry mock -->
+    <g opacity="0.9">
+      <circle cx="70" cy="80" r="3" fill="#22D3EE"></circle>
+      <circle cx="115" cy="150" r="3" fill="#22D3EE"></circle>
+      <circle cx="180" cy="120" r="3" fill="#7DD3FC"></circle>
+      <circle cx="240" cy="70" r="3" fill="#22D3EE"></circle>
+      <circle cx="220" cy="210" r="3" fill="#22D3EE"></circle>
+      <circle cx="150" cy="240" r="3" fill="#7DD3FC"></circle>
+      <line x1="70" y1="80" x2="115" y2="150" stroke="#1F2A37"></line>
+      <line x1="115" y1="150" x2="180" y2="120" stroke="#1F2A37"></line>
+      <line x1="180" y1="120" x2="240" y2="70" stroke="#1F2A37"></line>
+      <line x1="180" y1="120" x2="220" y2="210" stroke="#1F2A37"></line>
+      <line x1="150" y1="240" x2="220" y2="210" stroke="#1F2A37"></line>
+    </g>
+    <text x="20" y="270" fill="#E6F3FF" font-family="Inter, system-ui" font-size="18" font-weight="600">
+      Live Node Map
+    </text>
+  </g>
+
+  <!-- Tile 2: Generative Ritual -->
+  <g transform="translate(450,220)">
+    <rect width="300" height="300" rx="16" fill="#0E141B" stroke="rgba(255,255,255,0.08)"></rect>
+    <!-- triangle + node -->
+    <g transform="translate(150,145)">
+      <g filter="url(#soft)" opacity="0.45">
+        <circle cx="0" cy="0" r="24" fill="#22D3EE"></circle>
+      </g>
+      <polygon points="0,-40 34,20 -34,20" fill="none" stroke="url(#stroke)" stroke-width="2"></polygon>
+      <circle cx="0" cy="0" r="9" fill="#0B0F14" stroke="#22D3EE" stroke-width="2"></circle>
+      <circle cx="0" cy="0" r="3" fill="#22D3EE"></circle>
+    </g>
+    <text x="20" y="270" fill="#E6F3FF" font-family="Inter, system-ui" font-size="18" font-weight="600">
+      Generative Ritual
+    </text>
+  </g>
+
+  <!-- Tile 3: C96 Budget Pilot -->
+  <g transform="translate(760,220)">
+    <rect width="300" height="300" rx="16" fill="#0E141B" stroke="rgba(255,255,255,0.08)"></rect>
+    <!-- simple cycle rings -->
+    <circle cx="150" cy="150" r="70" stroke="#1F2A37" fill="none"></circle>
+    <circle cx="150" cy="150" r="46" stroke="#1F2A37" fill="none"></circle>
+    <circle cx="150" cy="150" r="22" stroke="#1F2A37" fill="none"></circle>
+    <circle cx="150" cy="78" r="6" fill="#22D3EE"></circle>
+    <circle cx="214" cy="130" r="6" fill="#7DD3FC"></circle>
+    <circle cx="110" cy="208" r="6" fill="#22D3EE"></circle>
+    <text x="20" y="270" fill="#E6F3FF" font-family="Inter, system-ui" font-size="18" font-weight="600">
+      C96 Budget Pilot
+    </text>
+  </g>
+</svg>
