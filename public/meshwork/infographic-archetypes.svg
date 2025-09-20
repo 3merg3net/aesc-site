@@ -1,0 +1,72 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="900" fill="#0B0F14"></rect>
+  <rect x="64" y="64" width="1472" height="772" rx="24" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="2"></rect>
+
+  <text x="96" y="140" fill="#B8FFF7" font-family="Inter" font-weight="600" font-size="42">Archetypes — a shared mental model</text>
+  <text x="96" y="182" fill="rgba(255,255,255,.65)" font-family="Inter" font-size="18">
+    Elements map to real responsibilities when weaving signed threads.
+  </text>
+
+  <!-- 5 tiles -->
+  <g transform="translate(96,240)">
+    <!-- EARTH -->
+    <g>
+      <rect width="280" height="320" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+      <text x="20" y="44" fill="#6BE3D8" font-family="Inter" font-weight="700" font-size="18">EARTH</text>
+      <text x="20" y="74" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="18">Anchors</text>
+      <text x="20" y="102" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="14">
+        Attested sites &amp; durable identity.
+      </text>
+      <path d="M40 250 L140 200 L240 250 Z" fill="none" stroke="#22D3EE" stroke-width="2"></path>
+      <circle cx="140" cy="205" r="4" fill="#22D3EE"></circle>
+    </g>
+
+    <!-- WATER -->
+    <g transform="translate(320,0)">
+      <rect width="280" height="320" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+      <text x="20" y="44" fill="#6BE3D8" font-family="Inter" font-weight="700" font-size="18">WATER</text>
+      <text x="20" y="74" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="18">Streams</text>
+      <text x="20" y="102" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="14">
+        Threads flowing through channels.
+      </text>
+      <path d="M40 240 C 120 210, 200 270, 240 230" fill="none" stroke="#22D3EE" stroke-width="2"></path>
+      <circle cx="100" cy="222" r="3" fill="#22D3EE"></circle><circle cx="200" cy="260" r="3" fill="#22D3EE"></circle>
+    </g>
+
+    <!-- FIRE -->
+    <g transform="translate(640,0)">
+      <rect width="280" height="320" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+      <text x="20" y="44" fill="#6BE3D8" font-family="Inter" font-weight="700" font-size="18">FIRE</text>
+      <text x="20" y="74" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="18">Compute</text>
+      <text x="20" y="102" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="14">
+        Jobs &amp; transformations on threads.
+      </text>
+      <path d="M60 240 L120 180 L180 260 L220 210" fill="none" stroke="#22D3EE" stroke-width="2"></path>
+      <circle cx="120" cy="180" r="3" fill="#22D3EE"></circle><circle cx="180" cy="260" r="3" fill="#22D3EE"></circle>
+    </g>
+
+    <!-- AIR -->
+    <g transform="translate(960,0)">
+      <rect width="280" height="320" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+      <text x="20" y="44" fill="#6BE3D8" font-family="Inter" font-weight="700" font-size="18">AIR</text>
+      <text x="20" y="74" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="18">Delivery &amp; Timing</text>
+      <text x="20" y="102" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="14">
+        Edge, cadence, latency windows.
+      </text>
+      <path d="M40 250 Q140 210, 240 250" fill="none" stroke="#22D3EE" stroke-width="2" stroke-dasharray="5 6"></path>
+      <circle cx="140" cy="230" r="3" fill="#22D3EE"></circle>
+    </g>
+
+    <!-- COSMOS row -->
+    <g transform="translate(0,360)">
+      <rect width="1240" height="180" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+      <text x="20" y="46" fill="#6BE3D8" font-family="Inter" font-weight="700" font-size="18">COSMOS</text>
+      <text x="20" y="76" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="18">Cycles &amp; Resonance (C96 / R96 / C768)</text>
+      <text x="20" y="104" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="14">
+        Align resourcing and rituals to temporal invariants; score threads across epochs.
+      </text>
+      <path d="M260 130 H1160" stroke="#22D3EE" stroke-width="2"></path>
+      <circle cx="420" cy="130" r="4" fill="#22D3EE"></circle><circle cx="740" cy="130" r="4" fill="#22D3EE"></circle><circle cx="1060" cy="130" r="4" fill="#22D3EE"></circle>
+    </g>
+  </g>
+</svg>

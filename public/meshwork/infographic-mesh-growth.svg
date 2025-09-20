@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="ÆSC Meshwork infographic">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B0F14"/>
+      <stop offset="100%" stop-color="#0A0D12"/>
+    </linearGradient>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <polygon points="0 0, 6 3, 0 6" fill="#22D3EE"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1600" height="900" fill="url(#g1)"/>
+  <rect x="64" y="64" width="1472" height="772" rx="24" ry="24" fill="none" stroke="rgba(255,255,255,0.08)"/>
+  <text x="88" y="112" fill="#E6FBFF" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="40" font-weight="700">Mesh Growth Over Time</text>
+  <text x="88" y="160" fill="rgba(230,251,255,0.78)" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="22">As more nodes post threads, the mesh densifies. Recent activity glows brighter;</text>
+  <text x="88" y="194" fill="rgba(230,251,255,0.78)" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="22">older fades softly.</text>
+
+  <g transform="translate(847,361)">
+    <circle r="16" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(332,704)">
+    <circle r="10" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="10" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(1377,313)">
+    <circle r="12" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(360,506)">
+    <circle r="16" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(676,330)">
+    <circle r="16" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(1342,347)">
+    <circle r="12" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(1365,583)">
+    <circle r="16" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(636,307)">
+    <circle r="12" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(1042,357)">
+    <circle r="10" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="10" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(1331,701)">
+    <circle r="12" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(1375,576)">
+    <circle r="12" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(383,564)">
+    <circle r="10" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="10" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(605,538)">
+    <circle r="16" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(1137,583)">
+    <circle r="16" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(797,411)">
+    <circle r="12" fill="#22D3EE" opacity="0.18" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.32999999999999996" />
+  </g>
+
+  <g transform="translate(351,578)">
+    <circle r="14" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="14" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(887,657)">
+    <circle r="16" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(333,344)">
+    <circle r="16" fill="#22D3EE" opacity="0.18" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.32999999999999996" />
+  </g>
+
+  <g transform="translate(884,361)">
+    <circle r="16" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(264,626)">
+    <circle r="10" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="10" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(880,639)">
+    <circle r="14" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="14" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(1371,692)">
+    <circle r="16" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(375,422)">
+    <circle r="16" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(308,658)">
+    <circle r="14" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="14" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(766,650)">
+    <circle r="16" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(230,520)">
+    <circle r="14" fill="#22D3EE" opacity="0.18" filter="url(#softGlow)"/>
+    <circle r="14" fill="none" stroke="#22D3EE" stroke-opacity="0.32999999999999996" />
+  </g>
+
+  <g transform="translate(423,536)">
+    <circle r="10" fill="#22D3EE" opacity="0.18" filter="url(#softGlow)"/>
+    <circle r="10" fill="none" stroke="#22D3EE" stroke-opacity="0.32999999999999996" />
+  </g>
+
+  <g transform="translate(772,350)">
+    <circle r="12" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(984,753)">
+    <circle r="16" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(524,513)">
+    <circle r="16" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(464,703)">
+    <circle r="16" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(1034,467)">
+    <circle r="16" fill="#22D3EE" opacity="0.18" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.32999999999999996" />
+  </g>
+
+  <g transform="translate(493,326)">
+    <circle r="12" fill="#22D3EE" opacity="0.18" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.32999999999999996" />
+  </g>
+
+  <g transform="translate(659,621)">
+    <circle r="12" fill="#22D3EE" opacity="0.12" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.27" />
+  </g>
+
+  <g transform="translate(1177,709)">
+    <circle r="12" fill="#22D3EE" opacity="0.25" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.4" />
+  </g>
+
+  <g transform="translate(761,286)">
+    <circle r="12" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="12" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(1278,473)">
+    <circle r="14" fill="#22D3EE" opacity="0.18" filter="url(#softGlow)"/>
+    <circle r="14" fill="none" stroke="#22D3EE" stroke-opacity="0.32999999999999996" />
+  </g>
+
+  <g transform="translate(1239,600)">
+    <circle r="10" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="10" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(1329,484)">
+    <circle r="16" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+
+  <g transform="translate(991,337)">
+    <circle r="16" fill="#22D3EE" opacity="0.35" filter="url(#softGlow)"/>
+    <circle r="16" fill="none" stroke="#22D3EE" stroke-opacity="0.5" />
+  </g>
+</svg>

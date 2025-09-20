@@ -1,0 +1,73 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B0F14"></stop>
+      <stop offset="1" stop-color="#0E141B"></stop>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g1)"></rect>
+  <!-- safe frame -->
+  <rect x="64" y="64" width="1472" height="772" rx="24" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="2"></rect>
+  <!-- title -->
+  <text x="96" y="140" fill="#B8FFF7" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto" font-weight="600" font-size="42">
+    APIs &amp; Event Channels — signed threads in / out
+  </text>
+  <text x="96" y="182" fill="rgba(255,255,255,.65)" font-family="Inter" font-size="18">
+    Simple REST for writes &amp; reads; channels for streaming the Meshwork’s signed threads.
+  </text>
+
+  <!-- REST card -->
+  <g transform="translate(96,240)">
+    <rect width="420" height="320" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+    <text x="20" y="44" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="22">REST</text>
+    <text x="20" y="80" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="16">
+      <tspan x="20" dy="0">POST /api/mesh/thread — ingest signed thread</tspan>
+      <tspan x="20" dy="24">GET  /api/nodes — latest presence view</tspan>
+    </text>
+    <rect x="20" y="120" width="380" height="170" rx="12" fill="#0A0F15" stroke="rgba(255,255,255,.06)"></rect>
+    <text x="36" y="150" fill="#BFEFFF" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="14">
+      curl -X POST https://aesctrust.org/api/mesh/thread
+    </text>
+    <text x="36" y="170" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      -H "Content-Type: application/json"
+    </text>
+    <text x="36" y="190" fill="#9ADCF4" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="13">
+      -d '{"{"}nodeId":"0xabc…"," ts":1713…," nonce":"…"," sig":"…"{"}"}'
+    </text>
+  </g>
+
+  <!-- Channels card -->
+  <g transform="translate(556,240)">
+    <rect width="420" height="320" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+    <text x="20" y="44" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="22">Event Channels</text>
+    <text x="20" y="80" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="16">
+      <tspan x="20" dy="0">mesh.thread • mesh.attest • mesh.signal</tspan>
+      <tspan x="20" dy="24">Replay, fanout, DLQs for analytics &amp; apps</tspan>
+    </text>
+    <!-- stylized stream -->
+    <path d="M30 200 C120 140, 260 260, 390 200" fill="none" stroke="#22D3EE" stroke-width="3"></path>
+    <circle cx="90" cy="165" r="4" fill="#22D3EE"></circle>
+    <circle cx="210" cy="215" r="4" fill="#22D3EE"></circle>
+    <circle cx="330" cy="175" r="4" fill="#22D3EE"></circle>
+  </g>
+
+  <!-- WebSocket card -->
+  <g transform="translate(1016,240)">
+    <rect width="420" height="320" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.08)"></rect>
+    <text x="20" y="44" fill="#FFFFFF" font-family="Inter" font-weight="600" font-size="22">WebSocket (roadmap)</text>
+    <text x="20" y="80" fill="rgba(255,255,255,.75)" font-family="Inter" font-size="16">
+      <tspan x="20" dy="0">Live subscriptions; topic filters &amp; cursors</tspan>
+    </text>
+    <rect x="20" y="120" width="380" height="170" rx="12" fill="#0A0F15" stroke="rgba(255,255,255,.06)"></rect>
+    <text x="36" y="152" fill="#BFEFFF" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="14">
+      ws mesh.threads → onmessage(event) { /* render */ }
+    </text>
+  </g>
+
+  <!-- thread motif -->
+  <g opacity="0.35">
+    <path d="M120 620 C 400 540, 800 720, 1480 640" fill="none" stroke="#22D3EE" stroke-width="2"></path>
+    <circle cx="320" cy="590" r="3" fill="#22D3EE"></circle><circle cx="680" cy="650" r="3" fill="#22D3EE"></circle>
+    <circle cx="1080" cy="610" r="3" fill="#22D3EE"></circle>
+  </g>
+</svg>
