@@ -1,22 +1,31 @@
 // src/lib/supabase.ts
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-// Read env once, but DO NOT throw at module scope
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+/**
+ * Server-only factory. Use 'anon' for reads and 'service' for writes/cron.
+ * Never expose the service key to the browser.
+ */
+export function getSupabase(role: "anon" | "service" = "anon"): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const svc  = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-let client: SupabaseClient | null = null;
+  if (!url) {
+    throw new Error("Supabase misconfig: NEXT_PUBLIC_SUPABASE_URL is missing");
+  }
 
-/** Returns a Supabase client or throws (inside the route handler) if misconfigured. */
-export function getSupabase(): SupabaseClient {
-  if (!url || !key) {
-    // Throw only when a route actually tries to use the DB
+  // Prefer service key when explicitly requested; fall back to anon if needed.
+  const key = role === "service" ? (svc || anon) : anon;
+
+  if (!key) {
     throw new Error(
-      "Supabase env missing: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (or server equivalents)."
+      `Supabase misconfig: ${
+        role === "service" ? "SUPABASE_SERVICE_ROLE_KEY (or anon fallback)" : "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      } is missing`
     );
   }
-  if (!client) {
-    client = createClient(url, key, { auth: { persistSession: false } });
-  }
-  return client;
+
+  // Server: no session persistence
+  return createClient(url, key, { auth: { persistSession: false } });
 }
+

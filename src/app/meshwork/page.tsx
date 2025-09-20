@@ -82,8 +82,7 @@ export default function MeshworkPage() {
           </p>
           <div className="mt-6">
              <LiveMapClient fullBleed heightClass="h-[70vh]" />
-
-          </div>
+            </div>
         </div>
       </section>
 
