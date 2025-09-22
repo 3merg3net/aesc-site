@@ -34,21 +34,24 @@ export default function StartWizard() {
     setMsg(null);
     try {
       const ts = Date.now();
-      const nonce = cryptoOk
-        ? window.crypto.randomUUID().replace(/-/g, "").slice(0, 16)
-        : Math.random().toString(16).slice(2, 18);
+      const nonce =
+        (typeof window !== "undefined" && window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : Math.random().toString(16).slice(2)) // fallback
+          .replace(/-/g, "")
+          .slice(0, 16);
 
       // UI calls it DePin; payload keeps server field name stickerId (null for now)
       const payload = {
         nodeId: nodeId.trim(),
-        stickerId: null, // DePin can be added later; keeping API shape for now
+        stickerId: null,
         ts,
         nonce,
         lat: lat ? Number(lat) : undefined,
         lon: lon ? Number(lon) : undefined,
       };
 
-      // Sign: HMAC-SHA256(secret, "nodeId|stickerId|ts|nonce")
+      // HMAC-SHA256(secret, "nodeId|stickerId|ts|nonce")
       const base = `${payload.nodeId}|${payload.stickerId ?? ""}|${payload.ts}|${payload.nonce}`;
       const enc = new TextEncoder();
       const key = await window.crypto.subtle.importKey(
@@ -58,25 +61,48 @@ export default function StartWizard() {
         false,
         ["sign"]
       );
-      const sigBuf = await window.crypto.subtle.sign(
-        "HMAC",
-        key,
-        enc.encode(base)
-      );
-      const sigHex = [...new Uint8Array(sigBuf)]
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      const sigBuf = await window.crypto.subtle.sign("HMAC", key, enc.encode(base));
+      const sigHex = [...new Uint8Array(sigBuf)].map(b => b.toString(16).padStart(2, "0")).join("");
 
-      // Endpoint still /api/mesh/ping for now
       const res = await fetch("/api/mesh/ping", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
         body: JSON.stringify({ ...payload, sig: sigHex }),
       });
-      const json = await res.json();
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || "Failed to post thread");
+
+      // Read raw first; then try JSON so we don't crash on HTML/empty
+      const raw = await res.text();
+      let json: any = null;
+      try {
+        json = raw ? JSON.parse(raw) : null;
+      } catch {
+        // non-JSON response; we'll surface a snippet below
       }
+
+      if (!res.ok || !json?.ok) {
+        const reason =
+          (json && (json.error || json.message)) ||
+          (raw && raw.slice(0, 300)) ||
+          `HTTP ${res.status}`;
+        throw new Error(`Server error: ${reason}`);
+      }
+
+      // inside handleSignAndSend(), right after JSON OK
+if (payload.lat != null && payload.lon != null) {
+  sessionStorage.setItem(
+    "lastThreadCenter",
+    JSON.stringify({
+      nodeId: payload.nodeId,   // ← NEW
+      lat: Number(payload.lat),
+      lon: Number(payload.lon),
+      ts: payload.ts,
+    })
+  );
+}
+
 
       setMsg("Thread posted. Opening map…");
       setTimeout(() => {
@@ -233,6 +259,7 @@ export default function StartWizard() {
     </div>
   );
 }
+
 
 
 

@@ -1,31 +1,44 @@
 // src/lib/supabase.ts
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
+
+let cachedAnon: SupabaseClient | null = null;
+let cachedService: SupabaseClient | null = null;
+
+function reqEnv(name: string) {
+  const v = process.env[name];
+  if (!v) throw new Error(`Supabase misconfig: ${name} is missing`);
+  return v;
+}
 
 /**
- * Server-only factory. Use 'anon' for reads and 'service' for writes/cron.
- * Never expose the service key to the browser.
+ * Use:
+ *  - getSupabase("anon")    → for public/browser reads (only in client code)
+ *  - getSupabase("service") → for server code that must bypass RLS (API routes)
+ *
+ * Required envs:
+ *  - NEXT_PUBLIC_SUPABASE_URL
+ *  - NEXT_PUBLIC_SUPABASE_ANON_KEY
+ *  - SUPABASE_SERVICE_ROLE_KEY
  */
-export function getSupabase(role: "anon" | "service" = "anon"): SupabaseClient {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const svc  = process.env.SUPABASE_SERVICE_ROLE_KEY;
+export function getSupabase(kind: "anon" | "service" = "anon") {
+  const url = reqEnv("NEXT_PUBLIC_SUPABASE_URL");
 
-  if (!url) {
-    throw new Error("Supabase misconfig: NEXT_PUBLIC_SUPABASE_URL is missing");
+  if (kind === "anon") {
+    if (!cachedAnon) {
+      const key = reqEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+      cachedAnon = createClient(url, key, { auth: { persistSession: false } });
+    }
+    return cachedAnon;
   }
 
-  // Prefer service key when explicitly requested; fall back to anon if needed.
-  const key = role === "service" ? (svc || anon) : anon;
-
-  if (!key) {
-    throw new Error(
-      `Supabase misconfig: ${
-        role === "service" ? "SUPABASE_SERVICE_ROLE_KEY (or anon fallback)" : "NEXT_PUBLIC_SUPABASE_ANON_KEY"
-      } is missing`
-    );
+  // kind === "service"
+  if (!cachedService) {
+    const key = reqEnv("SUPABASE_SERVICE_ROLE_KEY"); // server-only
+    cachedService = createClient(url, key, { auth: { persistSession: false } });
   }
-
-  // Server: no session persistence
-  return createClient(url, key, { auth: { persistSession: false } });
+  return cachedService;
 }
+
+
+
 

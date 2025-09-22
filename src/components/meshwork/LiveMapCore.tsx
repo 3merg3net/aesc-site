@@ -1,170 +1,155 @@
 "use client";
 
-import "leaflet/dist/leaflet.css"; // ensure tiles render
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import L, { Map as LeafletMap, LayerGroup } from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-type NodeRow = {
-  node_id: string;
-  last_seen: string;
-  lat: number | null;
-  lon: number | null;
-};
+type NodeRow = { node_id: string; last_seen: number; lat: number; lon: number };
 
-type Props = { fullBleed?: boolean; heightClass?: string };
+export default function LiveMapCore({
+  fullBleed,
+  heightClass = "h-[60vh] md:h-[70vh]",
+}: {
+  fullBleed?: boolean;
+  heightClass?: string;
+}) {
+  const mapRef = useRef<LeafletMap | null>(null);
+  const layerRef = useRef<LayerGroup | null>(null);
+  const pollRef = useRef<number | null>(null);
 
-export default function LiveMapCore({ fullBleed = true, heightClass = "h-[70vh]" }: Props) {
-  const [mounted, setMounted] = useState(false);
-  const [nodes, setNodes] = useState<NodeRow[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const pollId = useRef<number | null>(null);
+  async function load(group: LayerGroup) {
+    try {
+      const res = await fetch("/api/nodes", { cache: "no-store" });
+      const json = await res.json();
+      if (!json?.ok) return;
 
-  useEffect(() => setMounted(true), []);
+      const nodes: NodeRow[] = json.nodes ?? [];
+      group.clearLayers();
+
+      nodes.forEach((n) => {
+        const p = [n.lat, n.lon] as [number, number];
+
+        // soft aura
+        L.circle(p, {
+          radius: 8000,
+          color: "transparent",
+          fillColor: "rgba(56,189,248,0.22)",
+          fillOpacity: 0.28,
+        }).addTo(group);
+
+        // core dot
+        L.circleMarker(p, {
+          radius: 4,
+          color: "rgba(56,189,248,0.95)",
+          fillColor: "rgba(56,189,248,0.85)",
+          fillOpacity: 0.9,
+          weight: 1.5,
+        })
+          .bindTooltip(`${n.node_id}`, { direction: "top", opacity: 0.9 })
+          .addTo(group);
+      });
+    } catch {
+      // ignore fetch errors
+    }
+  }
 
   useEffect(() => {
-    let alive = true;
-    let es: EventSource | null = null;
+    if (mapRef.current) return;
 
-    const apply = (payload: any) => {
-      if (!alive) return;
-      const arr = Array.isArray(payload?.nodes) ? payload.nodes : [];
-      setNodes(arr);
-    };
+    const containerId = "meshwork-leaflet";
+    const el = document.getElementById(containerId);
+    if (!el) return;
 
-    const startPolling = () => {
-      const load = async () => {
-        try {
-          const r = await fetch("/api/nodes", { cache: "no-store" });
-          const j = await r.json();
-          apply(j);
-        } catch (e: any) {
-          if (!alive) return;
-          setError(e?.message ?? "Failed to load nodes");
-        }
-      };
-      load();
-      pollId.current = window.setInterval(load, 15000);
-    };
+    const map = L.map(el, {
+      zoomControl: true,
+      attributionControl: false,
+      scrollWheelZoom: true,
+      minZoom: 2,
+      maxZoom: 7,
+      worldCopyJump: true,
+    });
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      { subdomains: "abcd" }
+    ).addTo(map);
+    map.setView([22, 0], 3); // ← tighter default
 
+    const group = L.layerGroup().addTo(map);
+
+    mapRef.current = map;
+    layerRef.current = group;
+
+    // Initial load + poll
+    load(group);
+    pollRef.current = window.setInterval(() => load(group), 15000);
+
+    // Fly to last posted thread (once) if present
     try {
-      es = new EventSource("/api/nodes/stream");
-      es.onmessage = (ev) => {
-        try {
-          const payload = JSON.parse(ev.data);
-          apply(payload);
-        } catch {}
-      };
-      es.onerror = () => {
-        es?.close();
-        es = null;
-        startPolling();
-      };
-    } catch {
-      startPolling();
-    }
+      const raw = sessionStorage.getItem("lastThreadCenter");
+      if (raw) {
+        const { lat, lon } = JSON.parse(raw);
+        if (Number.isFinite(lat) && Number.isFinite(lon)) {
+          map.flyTo([lat, lon], 6, { duration: 1.1 });
+          // brief glow pulse
+          const pulse = L.circleMarker([lat, lon], {
+            radius: 10,
+            color: "rgba(56,189,248,0.9)",
+            fillColor: "rgba(56,189,248,0.5)",
+            fillOpacity: 0.6,
+            weight: 2,
+          }).addTo(map);
+          const glow = L.circle([lat, lon], {
+            radius: 10000,
+            color: "transparent",
+            fillColor: "rgba(56,189,248,0.25)",
+            fillOpacity: 0.35,
+          }).addTo(map);
+          setTimeout(() => {
+            map.removeLayer(pulse);
+            map.removeLayer(glow);
+          }, 2200);
+        }
+        sessionStorage.removeItem("lastThreadCenter");
+      }
+    } catch {}
+
+    // Controls from outside (panel)
+    const onFly = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      const { lat, lon, zoom = 6 } = detail;
+      if (Number.isFinite(lat) && Number.isFinite(lon)) {
+        map.flyTo([lat, lon], zoom, { duration: 1.0 });
+      }
+    };
+    const onRefresh = () => {
+      if (layerRef.current) load(layerRef.current);
+    };
+    window.addEventListener("mesh:flyTo", onFly);
+    window.addEventListener("mesh:refresh", onRefresh);
 
     return () => {
-      alive = false;
-      if (es) es.close();
-      if (pollId.current) {
-        clearInterval(pollId.current);
-        pollId.current = null;
-      }
+      window.removeEventListener("mesh:flyTo", onFly);
+      window.removeEventListener("mesh:refresh", onRefresh);
+      if (pollRef.current) clearInterval(pollRef.current);
+      map.remove();
+      mapRef.current = null;
+      layerRef.current = null;
+      pollRef.current = null;
     };
   }, []);
 
-  const parseTs = (v: string) => {
-    const n = Number(v);
-    if (Number.isFinite(n)) return n;
-    const iso = Date.parse(v);
-    return Number.isFinite(iso) ? iso : Date.now();
-  };
-  const short = (id: string) => (id && id.length > 12 ? `${id.slice(0, 6)}…${id.slice(-4)}` : id ?? "");
-
-  const center = useMemo<[number, number]>(() => [20, 0], []);
-
-  const outerClass = fullBleed
-    ? "relative w-screen max-w-none [margin-left:calc(50%-50vw)] [margin-right:calc(50%-50vw)]"
-    : "relative w-full";
-
-  if (!mounted) {
-    return (
-      <div className={`${outerClass} ${heightClass}`}>
-        <div className="absolute inset-0 grid place-items-center text-slate-400 text-sm">Loading map…</div>
-      </div>
-    );
-  }
-
   return (
-    <div className={outerClass}>
-      <div className={`relative ${heightClass} overflow-hidden rounded-none md:rounded-2xl border border-white/10`}>
-        {error && (
-          <div className="absolute inset-0 grid place-items-center text-slate-300 text-sm z-[500]">
-            {error}
-          </div>
-        )}
-
-        {/* Legend */}
-        <div className="pointer-events-none absolute right-3 bottom-3 z-[500] rounded-lg bg-black/50 px-3 py-2 ring-1 ring-white/10">
-          <div className="text-[11px] uppercase tracking-wide text-slate-400 mb-1">Legend</div>
-          <div className="flex flex-col gap-1">
-            <LegendItem c="#22d3ee" label="< 10m" />
-            <LegendItem c="#f59e0b" label="< 60m" />
-            <LegendItem c="#64748b" label="older" />
-          </div>
-        </div>
-
-        <MapContainer
-          center={center}
-          zoom={2}
-          scrollWheelZoom
-          className="h-full w-full"
-          preferCanvas
-          worldCopyJump
-        >
-          {/* Try a keyless, reliable tile set */}
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-          />
-
-          {nodes
-            .filter((n) => Number.isFinite(n?.lat) && Number.isFinite(n?.lon))
-            .map((n) => {
-              const ts = parseTs(n.last_seen);
-              const ageMin = Math.max(0, Math.round((Date.now() - ts) / 60000));
-              const color = ageMin < 10 ? "#22d3ee" : ageMin < 60 ? "#f59e0b" : "#64748b";
-              const radius = ageMin < 10 ? 6 : ageMin < 60 ? 5 : 4;
-
-              return (
-                <CircleMarker
-                  key={`${n.node_id}-${ts}`}
-                  center={[n.lat as number, n.lon as number]}
-                  radius={radius}
-                  pathOptions={{ color, fillColor: color, fillOpacity: 0.85, weight: 1 }}
-                >
-                  <Tooltip direction="top" offset={[0, -8]} opacity={1} sticky>
-                    <div className="text-xs">
-                      <div><b>node</b> {short(n.node_id)}</div>
-                      <div><b>last seen</b> {ageMin === 0 ? "now" : `${ageMin}m ago`}</div>
-                      <div><b>loc</b> {(n.lat as number).toFixed(3)}, {(n.lon as number).toFixed(3)}</div>
-                    </div>
-                  </Tooltip>
-                </CircleMarker>
-              );
-            })}
-        </MapContainer>
-      </div>
+    <div
+      className={[
+        fullBleed
+          ? "relative w-screen max-w-none [margin-left:calc(50%-50vw)] [margin-right:calc(50%-50vw)]"
+          : "relative w-full rounded-2xl border border-white/10 overflow-hidden",
+        heightClass,
+      ].join(" ")}
+    >
+      <div id="meshwork-leaflet" className="absolute inset-0" />
     </div>
   );
 }
 
-function LegendItem({ c, label }: { c: string; label: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: c }} />
-      <span className="text-xs text-slate-300">{label}</span>
-    </div>
-  );
-}
 

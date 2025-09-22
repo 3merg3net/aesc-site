@@ -7,6 +7,8 @@ import StatsBar from "@/components/meshwork/StatsBar";
 import RecentTicker from "@/components/meshwork/RecentTicker";
 // ⬇️ CHANGE: use the client-wrapped map
 import LiveMapClient from "@/components/meshwork/LiveMapClient";
+import MeshPanel from "@/components/meshwork/MeshPanel";
+
 
 export const metadata: Metadata = {
   title: "ÆSC Meshwork — Build on the Phramework",
@@ -94,18 +96,30 @@ export default function MeshworkPage() {
       <StatsBar />
 
       {/* LIVE MAP */}
-      <section id="map" className="border-b border-white/10">
-        <div className="mx-auto max-w-7xl px-0 py-12 md:py-16">
-          <h2 className="px-6 text-xl md:text-2xl font-semibold">Live Meshwork Map</h2>
-          <p className="mt-3 px-6 max-w-2xl text-sm text-zinc-400">
-            Each glowing point is a node posting verified threads—proof of presence across the globe.
-          </p>
-          <div className="mt-6">
-            {/* ⬇️ CHANGE: use client map wrapper */}
-            <LiveMapClient fullBleed heightClass="h-[70vh]" />
-          </div>
+<section id="map" className="border-b border-white/10">
+  <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+    <h2 className="text-xl md:text-2xl font-semibold">Live Meshwork Map</h2>
+    <p className="mt-3 max-w-2xl text-sm text-zinc-400">
+      Each glowing point is a node posting verified threads—proof of presence across the globe.
+    </p>
+
+    <div className="relative mt-6">
+      {/* Map (kept non–full bleed, tighter view) */}
+      <LiveMapClient heightClass="h-[60vh] md:h-[70vh]" />
+
+      {/* Panel overlay (bottom-left on map) */}
+      <div className="pointer-events-none absolute left-4 bottom-4">
+        <div className="pointer-events-auto">
+          {/* @ts-expect-error server/client boundary is fine here */}
+          {/**/}
+          {/* Import at top: import MeshPanel from "@/components/meshwork/MeshPanel"; */}
+          <MeshPanel />
         </div>
-      </section>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* CONTRACTS */}
       <section id="contracts" className="border-b border-white/10">
