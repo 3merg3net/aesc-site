@@ -108,14 +108,11 @@ export default function MeshworkPage() {
       <LiveMapClient heightClass="h-[60vh] md:h-[70vh]" />
 
       {/* Panel overlay (bottom-left on map) */}
-      <div className="pointer-events-none absolute left-4 bottom-4">
-        <div className="pointer-events-auto">
-          {/* @ts-expect-error server/client boundary is fine here */}
-          {/**/}
-          {/* Import at top: import MeshPanel from "@/components/meshwork/MeshPanel"; */}
-          <MeshPanel />
-        </div>
-      </div>
+     <div className="pointer-events-none absolute left-4 bottom-4">
+  <div className="pointer-events-auto">
+    <MeshPanel />
+  </div>
+</div>
     </div>
   </div>
 </section>
