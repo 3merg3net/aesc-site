@@ -146,6 +146,14 @@ export default function MeshPanel() {
     <div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">
       <h3 className="font-semibold text-white/90">Mesh Panel</h3>
 
+      {/* success ribbon when arriving from wizard */}
+{typeof window !== "undefined" && new URLSearchParams(window.location.search).get("justPosted") === "1" && (
+  <div className="mt-2 rounded-md bg-teal-400/15 ring-1 ring-teal-300/40 px-3 py-2 text-xs text-teal-200">
+    Thread recorded ✓ — use “Locate my thread” to jump to it.
+  </div>
+)}
+
+
       {/* Last thread (from redirect/session) */}
       <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
         <p className="text-xs text-zinc-400">Last thread</p>
@@ -167,6 +175,32 @@ export default function MeshPanel() {
             ) : (
               <p className="mt-1 text-zinc-400">No coordinates were included.</p>
             )}
+
+            {/* beneath the node/location details, before the confirmation box or buttons */}
+{lastCenter?.nodeId && (
+  <div className="mt-2 text-xs text-zinc-400">
+    <a
+      className="underline underline-offset-2 hover:text-zinc-200"
+      href={`/profile/${encodeURIComponent(lastCenter.nodeId)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Open profile
+    </a>
+    <span className="mx-2 opacity-40">•</span>
+    <a
+      className="underline underline-offset-2 hover:text-zinc-200"
+      href={`/api/qr?type=png&text=${encodeURIComponent(
+        (typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_BASE_URL || "")) +
+        "/profile/" + encodeURIComponent(lastCenter.nodeId)
+      )}`}
+      download={`mesh-node-${encodeURIComponent(lastCenter.nodeId)}.png`}
+    >
+      Download QR
+    </a>
+  </div>
+)}
+
 
             {/* Optional: show the DB-confirmed row details */}
             <div className="mt-2 rounded-md border border-white/10 bg-black/30 p-2 text-xs">
