@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import QRCodeImg from "./QRCode"; // adjust path if needed
+import { Suspense, useEffect, useState } from "react";
+// NOTE: We intentionally do NOT import useSearchParams to avoid CSR bailouts on the /meshwork page.
 
 type NodeRow = { node_id: string; last_seen: number; lat: number; lon: number };
 type Last = { nodeId?: string; lat?: number; lon?: number; ts?: number };
@@ -16,20 +17,13 @@ type LastThread = {
   lon: number | null;
 };
 
-export default function MeshPanel() {
-  const sp = useSearchParams();
-
-  // from URL if wizard redirected: ?justPosted=1&nodeId&lat&lon
-  const urlJustPosted = sp.get("justPosted") === "1";
-  const urlNode = sp.get("nodeId") || "";
-  const urlLat = sp.get("lat");
-  const urlLon = sp.get("lon");
-
+function InnerPanel() {
   const [lastCenter, setLastCenter] = useState<Last | null>(null);
   const [lastRow, setLastRow] = useState<LastThread | null>(null);
   const [recent, setRecent] = useState<NodeRow[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(false);
   const [loadingLast, setLoadingLast] = useState(false);
+  const [profileLink, setProfileLink] = useState<string | null>(null);
 
   // helper -> talk to LiveMapClient/LiveMapCore
   const flyTo = (lat?: number, lon?: number, zoom = 6) => {
@@ -42,52 +36,19 @@ export default function MeshPanel() {
   };
   const refreshMap = () => window.dispatchEvent(new Event("mesh:refresh"));
 
-  // 1) Capture URL params (if present) -> persist to session + pulse
+  // Bootstrap from session
   useEffect(() => {
-    if (!urlJustPosted || !urlNode) return;
-
-    const lat = urlLat ? Number(urlLat) : undefined;
-    const lon = urlLon ? Number(urlLon) : undefined;
-
-    const payload: Last = {
-      nodeId: urlNode,
-      lat: Number.isFinite(lat!) ? lat : undefined,
-      lon: Number.isFinite(lon!) ? lon : undefined,
-      ts: Date.now(),
-    };
-
-    try {
-      sessionStorage.setItem("lastThreadCenter", JSON.stringify(payload));
-      sessionStorage.setItem("mesh:last", JSON.stringify(payload)); // legacy echo
-    } catch {}
-
-    setLastCenter(payload);
-
-    // fly & pulse if we have coords
-    if (Number.isFinite(payload.lat!) && Number.isFinite(payload.lon!)) {
-      flyTo(payload.lat, payload.lon, 6);
-      pulseAt(payload.lat, payload.lon);
-    }
-
-    // We let the page clear the URL params; panel only reads them.
-  }, [urlJustPosted, urlNode, urlLat, urlLon]);
-
-  // 2) Bootstrap "last" (from session) if no URL-driven state this time
-  useEffect(() => {
-    if (urlJustPosted) return; // already handled
-    let fromSession: Last | null = null;
     try {
       const raw = sessionStorage.getItem("lastThreadCenter");
-      if (raw) fromSession = JSON.parse(raw);
-      if (!fromSession) {
-        const raw2 = sessionStorage.getItem("mesh:last"); // legacy key
-        if (raw2) fromSession = JSON.parse(raw2);
-      }
+      if (raw) setLastCenter(JSON.parse(raw));
     } catch {}
-    if (fromSession) setLastCenter(fromSession);
-  }, [urlJustPosted]);
+    try {
+      const rawP = sessionStorage.getItem("mesh:lastProfile");
+      if (rawP) setProfileLink(rawP);
+    } catch {}
+  }, []);
 
-  // 3) Load recent nodes (for the right list)
+  // Load recent nodes
   const loadRecent = async () => {
     try {
       setLoadingRecent(true);
@@ -109,9 +70,9 @@ export default function MeshPanel() {
     loadRecent();
   }, []);
 
-  // 4) Load last row details for the focused node (if we have one)
+  // Load last row details for the focused node (if we have one)
   useEffect(() => {
-    const node = lastCenter?.nodeId || urlNode || "";
+    const node = lastCenter?.nodeId || "";
     if (!node) {
       setLastRow(null);
       return;
@@ -137,7 +98,7 @@ export default function MeshPanel() {
     return () => {
       alive = false;
     };
-  }, [lastCenter?.nodeId, urlNode]);
+  }, [lastCenter?.nodeId]);
 
   const hasCoords =
     Number.isFinite(lastCenter?.lat as number) && Number.isFinite(lastCenter?.lon as number);
@@ -146,20 +107,22 @@ export default function MeshPanel() {
     <div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">
       <h3 className="font-semibold text-white/90">Mesh Panel</h3>
 
-      {/* success ribbon when arriving from wizard */}
-{typeof window !== "undefined" && new URLSearchParams(window.location.search).get("justPosted") === "1" && (
-  <div className="mt-2 rounded-md bg-teal-400/15 ring-1 ring-teal-300/40 px-3 py-2 text-xs text-teal-200">
-    Thread recorded ✓ — use “Locate my thread” to jump to it.
-  </div>
-)}
-
+      
 
       {/* Last thread (from redirect/session) */}
       <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
         <p className="text-xs text-zinc-400">Last thread</p>
 
         {lastCenter?.nodeId ? (
-          <>
+
+           <>
+          <QRCodeImg
+      text={`/u/${encodeURIComponent(lastCenter.nodeId)}`}
+      size={180}
+      format="svg"           // or "png"
+      className="rounded-md bg-white p-2"
+      title="Scan to open node profile"
+    />
             <div className="mt-1">
               <span className="text-zinc-300">Node:</span>{" "}
               <span className="font-medium">{lastCenter.nodeId}</span>
@@ -176,33 +139,7 @@ export default function MeshPanel() {
               <p className="mt-1 text-zinc-400">No coordinates were included.</p>
             )}
 
-            {/* beneath the node/location details, before the confirmation box or buttons */}
-{lastCenter?.nodeId && (
-  <div className="mt-2 text-xs text-zinc-400">
-    <a
-      className="underline underline-offset-2 hover:text-zinc-200"
-      href={`/profile/${encodeURIComponent(lastCenter.nodeId)}`}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Open profile
-    </a>
-    <span className="mx-2 opacity-40">•</span>
-    <a
-      className="underline underline-offset-2 hover:text-zinc-200"
-      href={`/api/qr?type=png&text=${encodeURIComponent(
-        (typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_BASE_URL || "")) +
-        "/profile/" + encodeURIComponent(lastCenter.nodeId)
-      )}`}
-      download={`mesh-node-${encodeURIComponent(lastCenter.nodeId)}.png`}
-    >
-      Download QR
-    </a>
-  </div>
-)}
-
-
-            {/* Optional: show the DB-confirmed row details */}
+            {/* DB-confirmed row details */}
             <div className="mt-2 rounded-md border border-white/10 bg-black/30 p-2 text-xs">
               {loadingLast && <div className="opacity-70">Loading confirmation…</div>}
               {!loadingLast && lastRow && (
@@ -229,29 +166,30 @@ export default function MeshPanel() {
             </div>
 
             <div className="mt-2 flex gap-2">
-              <button
-                className="rounded-lg bg-teal-400/10 px-3 py-1 ring-1 ring-teal-300/40 hover:bg-teal-400/15"
-                onClick={() => {
-                  if (hasCoords) {
-                    flyTo(lastCenter.lat, lastCenter.lon, 6);
-                    pulseAt(lastCenter.lat, lastCenter.lon);
-                  } else {
-                    refreshMap();
-                  }
-                }}
-              >
-                Locate my thread
-              </button>
-              <button
-                className="rounded-lg px-3 py-1 ring-1 ring-white/15 hover:bg-white/10"
-                onClick={() => {
-                  refreshMap();
-                  loadRecent();
-                }}
-              >
-                Refresh
-              </button>
-            </div>
+  <button
+    className="rounded-lg bg-teal-400/10 px-3 py-1 ring-1 ring-teal-300/40 hover:bg-teal-400/15"
+    onClick={() => {
+      if (hasCoords) {
+        // Fly + pulse if we have coordinates
+        window.dispatchEvent(new CustomEvent("mesh:flyTo", { detail: { lat: lastCenter!.lat, lon: lastCenter!.lon, zoom: 6 } }));
+        window.dispatchEvent(new CustomEvent("mesh:pulseAt", { detail: { lat: lastCenter!.lat, lon: lastCenter!.lon } }));
+      } else {
+        window.dispatchEvent(new Event("mesh:refresh"));
+      }
+    }}
+  >
+    Locate my thread
+  </button>
+
+  <a
+    className="rounded-lg px-3 py-1 ring-1 ring-white/15 hover:bg-white/10"
+    href={`/u/${encodeURIComponent(lastCenter!.nodeId!)}`}
+  >
+    Open my profile →
+  </a>
+</div>
+
+
           </>
         ) : (
           <p className="text-zinc-300">
@@ -259,6 +197,7 @@ export default function MeshPanel() {
           </p>
         )}
       </div>
+      
 
       {/* Recent activity list */}
       <div className="mt-4">
@@ -290,12 +229,20 @@ export default function MeshPanel() {
               </span>
             </li>
           ))}
-          {recent.length === 0 && (
-            <li className="text-xs text-zinc-400">No recent nodes yet.</li>
-          )}
+          {recent.length === 0 && <li className="text-xs text-zinc-400">No recent nodes yet.</li>}
         </ul>
       </div>
     </div>
   );
 }
+
+
+export default function MeshPanel() {
+  return (
+    <Suspense fallback={<div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">Loading…</div>}>
+      <InnerPanel />
+    </Suspense>
+  );
+}
+
 
