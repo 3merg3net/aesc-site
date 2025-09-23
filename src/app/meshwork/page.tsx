@@ -9,6 +9,7 @@ import RecentTicker from "@/components/meshwork/RecentTicker";
 import LiveMapClient from "@/components/meshwork/LiveMapClient";
 import MeshPanel from "@/components/meshwork/MeshPanel";
 import { Suspense } from "react";
+import MeshPanelIsland from "@/components/meshwork/MeshPanelIsland";
 
 
 export const metadata: Metadata = {
@@ -111,9 +112,7 @@ export default function MeshworkPage() {
       <div className="pointer-events-none absolute left-4 bottom-4 z-[401]">
         <div className="pointer-events-auto">
           {/* import MeshPanel at top: import MeshPanel from "@/components/meshwork/MeshPanel"; */}
-          <Suspense fallback={null}>
-+            <MeshPanel />
-+          </Suspense>
+          <MeshPanelIsland />
         </div>
       </div>
     </div>
