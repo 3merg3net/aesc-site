@@ -1,19 +1,27 @@
-// src/app/api/diag/route.ts
 export const runtime = "nodejs";
+export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
+import { getSupabase } from "@/lib/supabase";
 
-export async function GET() {
-  const present = (name: string) => Boolean(process.env[name] && process.env[name]!.length > 0);
-  return NextResponse.json({
-    ok: true,
-    env: {
-      NEXT_PUBLIC_SUPABASE_URL: present("NEXT_PUBLIC_SUPABASE_URL"),
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: present("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
-      SUPABASE_SERVICE_ROLE_KEY: present("SUPABASE_SERVICE_ROLE_KEY"),
-      SUPABASE_JWT_SECRET: present("SUPABASE_JWT_SECRET"),
-    },
-    runtime: process.env.VERCEL ? "vercel" : "local",
-  });
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const nodeId = url.searchParams.get("nodeId") || null;
+    const limit = Number(url.searchParams.get("limit") || 10);
+    const supabase = getSupabase("service");
+
+    let q = supabase.from("pings").select("id,node_id,ts,nonce,sig,lat,lon").order("ts", { ascending: false });
+    if (nodeId) q = q.eq("node_id", nodeId);
+    q = q.limit(Math.min(Math.max(limit, 1), 50));
+
+    const { data, error } = await q;
+    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 400 });
+
+    return NextResponse.json({ ok: true, count: data?.length || 0, rows: data ?? [] });
+  } catch (e: any) {
+    return NextResponse.json({ ok: false, error: e?.message || "Unexpected error" }, { status: 500 });
+  }
 }
+

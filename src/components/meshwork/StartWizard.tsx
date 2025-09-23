@@ -4,29 +4,39 @@ import { useEffect, useMemo, useState } from "react";
 
 type Step = 1 | 2 | 3;
 
-function randBase36(n = 6) {
-  return Array.from(crypto.getRandomValues(new Uint8Array(n)))
-    .map((b) => (b % 36).toString(36))
+// Build-time injected; safe for client because it's demo-only
+const SHARED = process.env.NEXT_PUBLIC_DEMO_SHARED_SECRET || "";
+
+// Helpers
+function genNodeId() {
+  const h = (n = 6) =>
+    Array.from(crypto.getRandomValues(new Uint8Array(n)))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+      .slice(0, n);
+  return `aesc-${h(6)}-${h(6)}`;
+}
+
+function genSecret() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
-function generateNodeId() {
-  const ts = Date.now().toString(36).slice(-4);
-  return `node-Æ${ts}-${randBase36(6)}`;
-}
-
-function hex(bytes = 32) {
-  const buf = crypto.getRandomValues(new Uint8Array(bytes));
-  return [...buf].map((b) => b.toString(16).padStart(2, "0")).join("");
+async function hmacHex(secret: string, message: string) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [
+    "sign",
+  ]);
+  const sigBuf = await crypto.subtle.sign("HMAC", key, enc.encode(message));
+  return [...new Uint8Array(sigBuf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 export default function StartWizard() {
   const [step, setStep] = useState<Step>(1);
 
-  // form state
   const [nodeId, setNodeId] = useState("");
-  const [seed, setSeed] = useState("");       // local helper/entropy (not sent)
-  const [secret, setSecret] = useState("");   // HMAC key (local only)
+  const [secret, setSecret] = useState("");
   const [lat, setLat] = useState<string>("");
   const [lon, setLon] = useState<string>("");
   const [busy, setBusy] = useState(false);
@@ -34,72 +44,44 @@ export default function StartWizard() {
 
   const cryptoOk = typeof window !== "undefined" && !!window.crypto?.subtle;
 
-  // initial generation
-  useEffect(() => {
-    try {
-      const preNode = generateNodeId();
-      const preSeed = hex(32);
-      const preSecret = hex(32);
-      setNodeId(preNode);
-      setSeed(preSeed);
-      setSecret(preSecret);
-      sessionStorage.setItem("mesh:seed", preSeed);
-      sessionStorage.setItem("mesh:secret", preSecret);
-    } catch {}
-  }, []);
-
   useEffect(() => setMsg(null), [step]);
+
+  // Autofill
+  useEffect(() => {
+    if (!nodeId && cryptoOk) setNodeId(genNodeId());
+    if (!secret && cryptoOk) setSecret(genSecret());
+  }, [cryptoOk]); // once crypto is available
 
   const canContinue1 = useMemo(() => nodeId.trim().length >= 4, [nodeId]);
   const canContinue2 = useMemo(
-    () =>
-      secret.trim().length >= 8 &&
-      (!lat || !isNaN(Number(lat))) &&
-      (!lon || !isNaN(Number(lon))),
+    () => secret.trim().length >= 8 && (!lat || !isNaN(Number(lat))) && (!lon || !isNaN(Number(lon))),
     [secret, lat, lon]
   );
-
-  const origin =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : (process.env.NEXT_PUBLIC_BASE_URL || "");
-
-  const profileUrl =
-    origin ? `${origin}/profile/${encodeURIComponent(nodeId || "")}` : "";
 
   async function handleSignAndSend() {
     setBusy(true);
     setMsg(null);
     try {
+      if (!cryptoOk) throw new Error("Secure crypto not available (use localhost or HTTPS).");
+
       const ts = Date.now();
-      const nonce = (typeof window !== "undefined" && window.crypto?.randomUUID
-        ? window.crypto.randomUUID()
-        : Math.random().toString(16).slice(2)
-      ).replace(/-/g, "").slice(0, 16);
+      const nonce = (crypto.randomUUID?.() ?? Math.random().toString(16).slice(2)).replace(/-/g, "").slice(0, 16);
+
+      // NOTE: For the demo, both client & server use the same shared secret.
+      // If SHARED is present, we ignore the user-entered secret when signing.
+      const signingSecret = SHARED || secret;
 
       const payload = {
         nodeId: nodeId.trim(),
-        stickerId: null, // DePin later; keep API shape
+        stickerId: null,
         ts,
         nonce,
         lat: lat ? Number(lat) : undefined,
         lon: lon ? Number(lon) : undefined,
       };
 
-      // HMAC-SHA256(secret, "nodeId|stickerId|ts|nonce")
       const base = `${payload.nodeId}|${payload.stickerId ?? ""}|${payload.ts}|${payload.nonce}`;
-      const enc = new TextEncoder();
-      const key = await window.crypto.subtle.importKey(
-        "raw",
-        enc.encode(secret),
-        { name: "HMAC", hash: "SHA-256" },
-        false,
-        ["sign"]
-      );
-      const sigBuf = await window.crypto.subtle.sign("HMAC", key, enc.encode(base));
-      const sigHex = [...new Uint8Array(sigBuf)]
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      const sigHex = await hmacHex(signingSecret, base);
 
       const res = await fetch("/api/mesh/ping", {
         method: "POST",
@@ -109,29 +91,41 @@ export default function StartWizard() {
 
       const raw = await res.text();
       let json: any = null;
-      try { json = raw ? JSON.parse(raw) : null; } catch {}
+      try {
+        json = raw ? JSON.parse(raw) : null;
+      } catch {}
 
       if (!res.ok || !json?.ok) {
         const reason = (json && (json.error || json.message)) || (raw && raw.slice(0, 300)) || `HTTP ${res.status}`;
         throw new Error(`Server error: ${reason}`);
       }
 
-      // Persist echo for MeshPanel
+      // Hand off to Map + Profile
       try {
-        const last = { nodeId: payload.nodeId, lat: payload.lat, lon: payload.lon, ts: payload.ts };
-        sessionStorage.setItem("lastThreadCenter", JSON.stringify(last));
-        sessionStorage.setItem("mesh:last", JSON.stringify(last));
+        const center = {
+          nodeId: payload.nodeId,
+          lat: Number.isFinite(payload.lat as number) ? payload.lat : undefined,
+          lon: Number.isFinite(payload.lon as number) ? payload.lon : undefined,
+          ts,
+        };
+        sessionStorage.setItem("lastThreadCenter", JSON.stringify(center));
+        sessionStorage.setItem("mesh:last", JSON.stringify(center));
+        sessionStorage.setItem("mesh:lastProfile", `/u/${encodeURIComponent(payload.nodeId)}`);
       } catch {}
 
-      // Redirect with params so MeshPanel shows the success ribbon and animates
-      const params = new URLSearchParams({ justPosted: "1", nodeId: payload.nodeId });
-      if (Number.isFinite(payload.lat as number)) params.set("lat", String(payload.lat));
-      if (Number.isFinite(payload.lon as number)) params.set("lon", String(payload.lon));
-
       setMsg("Thread posted. Opening map…");
+      // Open Profile in a new tab (optional), then go to Map
+      const profileUrl = `/u/${encodeURIComponent(payload.nodeId)}`;
+      window.open(profileUrl, "_blank", "noopener,noreferrer");
       setTimeout(() => {
-        window.location.assign(`/meshwork?${params.toString()}#map`);
-      }, 700);
+        const q = new URLSearchParams({
+          justPosted: "1",
+          nodeId: payload.nodeId,
+          ...(payload.lat != null ? { lat: String(payload.lat) } : {}),
+          ...(payload.lon != null ? { lon: String(payload.lon) } : {}),
+        });
+        window.location.assign(`/meshwork#map?${q.toString()}`);
+      }, 500);
     } catch (e: any) {
       setMsg(e?.message || "Signing or post failed.");
     } finally {
@@ -142,9 +136,7 @@ export default function StartWizard() {
   return (
     <div className="rounded-2xl border border-white/10 bg-black/30 p-5 md:p-6">
       <h2 className="text-xl font-semibold">Start Here — 3-Step Thread Wizard</h2>
-      <p className="mt-2 text-sm text-zinc-300">
-        We’ll help you create a Node ID, auto-generate a secret, sign a thread, and see it on the live map.
-      </p>
+      <p className="mt-2 text-sm text-zinc-300">We’ll help you create a Node ID, sign a thread, and see it on the live map.</p>
 
       {/* steps indicator */}
       <div className="mt-4 flex items-center gap-3 text-xs text-zinc-400">
@@ -166,90 +158,44 @@ export default function StartWizard() {
         })}
       </div>
 
-      {/* STEP 1 */}
+      {/* step panes */}
       {step === 1 && (
-        <div className="mt-6 grid gap-4 md:grid-cols-[1fr,280px]">
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div>
             <label className="text-sm text-zinc-300">Node ID</label>
             <div className="mt-1 flex gap-2">
               <input
                 className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-teal-400/40"
-                placeholder="e.g. node-Æ8k3f-7q2c9x"
+                placeholder="e.g. aesc-xxxxxx-yyyyyy"
                 value={nodeId}
                 onChange={(e) => setNodeId(e.target.value)}
               />
               <button
                 type="button"
-                className="rounded-lg px-3 py-2 text-xs ring-1 ring-white/15 hover:bg-white/10"
-                onClick={() => {
-                  const nid = generateNodeId();
-                  const s = hex(32);
-                  setNodeId(nid);
-                  setSeed(s);
-                  try {
-                    sessionStorage.setItem("mesh:seed", s);
-                  } catch {}
-                }}
+                className="rounded-lg px-3 py-2 text-xs ring-1 ring-white/10 hover:bg-white/5"
+                onClick={() => setNodeId(genNodeId())}
+                title="Regenerate"
               >
-                Generate
+                ↻
               </button>
             </div>
-            <p className="mt-2 text-xs text-zinc-400">
-              Any stable string works. You can register this on-chain later via NodeRegistry for durability.
-            </p>
-
-            <div className="mt-3">
-              <label className="text-sm text-zinc-300">Local Seed (keep this safe)</label>
-              <div className="mt-1 flex items-center gap-2">
-                <input
-                  readOnly
-                  value={seed}
-                  className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-[12px] font-mono text-zinc-300"
-                />
-                <button
-                  type="button"
-                  className="rounded-lg px-3 py-2 text-xs ring-1 ring-white/15 hover:bg-white/10"
-                  onClick={() => navigator.clipboard.writeText(seed)}
-                >
-                  Copy
-                </button>
-              </div>
-              <p className="mt-1 text-xs text-zinc-500">
-                Stored locally (session). Wallets will replace this later.
-              </p>
-            </div>
+            <p className="mt-2 text-xs text-zinc-400">Any stable string works. You can register this on-chain later via NodeRegistry.</p>
           </div>
 
-          {/* Node Profile QR (based on nodeId) */}
-          <aside className="rounded-xl border border-white/10 bg-white/5 p-3">
-            <p className="text-xs text-zinc-400">Node Profile QR</p>
-            <div className="mt-2 rounded-lg bg-black/60 p-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                alt="QR code"
-                src={`/api/qr?type=svg&text=${encodeURIComponent(profileUrl || nodeId)}`}
-                className="mx-auto h-auto w-full max-w-[220px]"
-              />
-            </div>
-            {profileUrl && (
-              <a
-                className="mt-3 inline-block rounded-lg px-3 py-2 text-xs ring-1 ring-white/15 hover:bg-white/10"
-                href={`/api/qr?type=png&text=${encodeURIComponent(profileUrl)}`}
-                download={`mesh-node-${encodeURIComponent(nodeId)}.png`}
-              >
-                Download PNG
-              </a>
-            )}
-          </aside>
+          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+            <p className="text-xs text-zinc-300">
+              A <strong>thread</strong> proves your node is active now. It includes Node ID, timestamp, and a random nonce,
+              signed with your secret so others can trust it. You can attach a <strong>DePin</strong> tag later (kept in{" "}
+              <code>stickerId</code>).
+            </p>
+          </div>
 
           <div className="md:col-span-2">
             <button
               disabled={!canContinue1}
               onClick={() => setStep(2)}
               className={`rounded-xl px-4 py-2 text-sm ring-1 ${
-                canContinue1
-                  ? "bg-teal-400/10 ring-teal-300/40 hover:bg-teal-400/15"
-                  : "bg-white/5 ring-white/10 opacity-50 cursor-not-allowed"
+                canContinue1 ? "bg-teal-400/10 ring-teal-300/40 hover:bg-teal-400/15" : "bg-white/5 ring-white/10 opacity-50 cursor-not-allowed"
               }`}
             >
               Continue to Sign →
@@ -258,41 +204,29 @@ export default function StartWizard() {
         </div>
       )}
 
-      {/* STEP 2 */}
       {step === 2 && (
-        <div className="mt-6 grid gap-4 md:grid-cols-[1fr,280px]">
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div>
-            <label className="text-sm text-zinc-300">HMAC Secret</label>
+            <label className="text-sm text-zinc-300">Secret (HMAC key)</label>
             <div className="mt-1 flex gap-2">
               <input
                 type="password"
                 className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-teal-400/40"
-                placeholder="auto-generated"
+                placeholder="min 8 chars"
                 value={secret}
                 onChange={(e) => setSecret(e.target.value)}
+                disabled={!!SHARED} // when demo secret is on, we ignore this value for signing
               />
               <button
                 type="button"
-                className="rounded-lg px-3 py-2 text-xs ring-1 ring-white/15 hover:bg-white/10"
-                onClick={() => {
-                  const s = hex(32);
-                  setSecret(s);
-                  try { sessionStorage.setItem("mesh:secret", s); } catch {}
-                }}
+                className="rounded-lg px-3 py-2 text-xs ring-1 ring-white/10 hover:bg-white/5 disabled:opacity-50"
+                onClick={() => setSecret(genSecret())}
+                disabled={!!SHARED}
+                title={SHARED ? "Using shared demo secret" : "Regenerate"}
               >
-                Regenerate
-              </button>
-              <button
-                type="button"
-                className="rounded-lg px-3 py-2 text-xs ring-1 ring-white/15 hover:bg-white/10"
-                onClick={() => navigator.clipboard.writeText(secret)}
-              >
-                Copy
+                ↻
               </button>
             </div>
-            <p className="mt-2 text-xs text-zinc-500">
-              Stored locally (session). Not uploaded. Keep safe.
-            </p>
 
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div>
@@ -314,53 +248,34 @@ export default function StartWizard() {
                 />
               </div>
             </div>
-            <p className="mt-2 text-xs text-zinc-400">
-              We sign <code className="bg-black/40 px-1 rounded">nodeId|stickerId|ts|nonce</code> with HMAC-SHA256 using your secret. This proves the thread is really from you and fresh in time.
-            </p>
-
-            <div className="mt-3 flex items-center gap-3">
-              <button
-                disabled={!canContinue2 || busy}
-                onClick={handleSignAndSend}
-                className={`rounded-xl px-4 py-2 text-sm ring-1 ${
-                  canContinue2 && !busy
-                    ? "bg-teal-400/10 ring-teal-300/40 hover:bg-teal-400/15"
-                    : "bg-white/5 ring-white/10 opacity-50 cursor-not-allowed"
-                }`}
-              >
-                {busy ? "Posting…" : "Post Thread →"}
-              </button>
-              <button
-                onClick={() => setStep(1)}
-                className="rounded-xl px-3 py-2 text-xs ring-1 ring-white/10 hover:bg-white/5"
-              >
-                ← Back
-              </button>
-              {msg && <span className="text-xs text-zinc-300">{msg}</span>}
-            </div>
+            {SHARED && (
+              <p className="mt-2 text-xs text-emerald-300/80">
+                Using demo shared secret for signing (client & server match).
+              </p>
+            )}
           </div>
 
-          {/* Keep a QR preview here too (handy when printing a DePin sticker) */}
-          <aside className="rounded-xl border border-white/10 bg-white/5 p-3">
-            <p className="text-xs text-zinc-400">Node Profile QR</p>
-            <div className="mt-2 rounded-lg bg-black/60 p-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                alt="QR code"
-                src={`/api/qr?type=svg&text=${encodeURIComponent(profileUrl || nodeId)}`}
-                className="mx-auto h-auto w-full max-w-[220px]"
-              />
-            </div>
-            {profileUrl && (
-              <a
-                className="mt-3 inline-block rounded-lg px-3 py-2 text-xs ring-1 ring-white/15 hover:bg-white/10"
-                href={`/api/qr?type=png&text=${encodeURIComponent(profileUrl)}`}
-                download={`mesh-node-${encodeURIComponent(nodeId)}.png`}
-              >
-                Download PNG
-              </a>
-            )}
-          </aside>
+          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+            <p className="text-xs text-zinc-300">
+              We sign <code className="bg-black/40 px-1 rounded">nodeId|stickerId|ts|nonce</code> using HMAC-SHA256 with the demo secret.
+            </p>
+          </div>
+
+          <div className="md:col-span-2 flex items-center gap-3">
+            <button
+              disabled={!canContinue2 || busy}
+              onClick={handleSignAndSend}
+              className={`rounded-xl px-4 py-2 text-sm ring-1 ${
+                canContinue2 && !busy ? "bg-teal-400/10 ring-teal-300/40 hover:bg-teal-400/15" : "bg-white/5 ring-white/10 opacity-50 cursor-not-allowed"
+              }`}
+            >
+              {busy ? "Posting…" : "Post Thread →"}
+            </button>
+            <button onClick={() => setStep(1)} className="rounded-xl px-3 py-2 text-xs ring-1 ring-white/10 hover:bg-white/5">
+              ← Back
+            </button>
+            {msg && <span className="text-xs text-zinc-300">{msg}</span>}
+          </div>
         </div>
       )}
 
@@ -372,6 +287,9 @@ export default function StartWizard() {
     </div>
   );
 }
+
+
+
 
 
 
