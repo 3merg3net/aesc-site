@@ -1,8 +1,7 @@
 "use client";
 
-import QRCodeImg from "./QRCode"; // adjust path if needed
 import { Suspense, useEffect, useState } from "react";
-// NOTE: We intentionally do NOT import useSearchParams to avoid CSR bailouts on the /meshwork page.
+// NOTE: Intentionally no useSearchParams to avoid CSR bailouts.
 
 type NodeRow = { node_id: string; last_seen: number; lat: number; lon: number };
 type Last = { nodeId?: string; lat?: number; lon?: number; ts?: number };
@@ -23,9 +22,9 @@ function InnerPanel() {
   const [recent, setRecent] = useState<NodeRow[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(false);
   const [loadingLast, setLoadingLast] = useState(false);
-  const [profileLink, setProfileLink] = useState<string | null>(null);
+  const [profileLink, setProfileLink] = useState<string | null>(null); // absolute URL for QR
 
-  // helper -> talk to LiveMapClient/LiveMapCore
+  // Map helpers
   const flyTo = (lat?: number, lon?: number, zoom = 6) => {
     if (lat == null || lon == null) return;
     window.dispatchEvent(new CustomEvent("mesh:flyTo", { detail: { lat, lon, zoom } }));
@@ -43,8 +42,12 @@ function InnerPanel() {
       if (raw) setLastCenter(JSON.parse(raw));
     } catch {}
     try {
-      const rawP = sessionStorage.getItem("mesh:lastProfile");
-      if (rawP) setProfileLink(rawP);
+      const rawP = sessionStorage.getItem("mesh:lastProfile"); // may be a relative path
+      if (rawP && typeof window !== "undefined") {
+        const origin = window.location.origin;
+        const absolute = rawP.startsWith("http") ? rawP : `${origin}${rawP}`;
+        setProfileLink(absolute);
+      }
     } catch {}
   }, []);
 
@@ -70,7 +73,7 @@ function InnerPanel() {
     loadRecent();
   }, []);
 
-  // Load last row details for the focused node (if we have one)
+  // Load last DB-confirmed row for focused node (if any)
   useEffect(() => {
     const node = lastCenter?.nodeId || "";
     if (!node) {
@@ -103,26 +106,35 @@ function InnerPanel() {
   const hasCoords =
     Number.isFinite(lastCenter?.lat as number) && Number.isFinite(lastCenter?.lon as number);
 
+  // Build an absolute profile URL for QR if we have a nodeId
+  const absoluteProfileUrl =
+    typeof window !== "undefined" && lastCenter?.nodeId
+      ? `${window.location.origin}/u/${encodeURIComponent(lastCenter.nodeId)}`
+      : profileLink || null;
+
   return (
     <div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">
       <h3 className="font-semibold text-white/90">Mesh Panel</h3>
-
-      
 
       {/* Last thread (from redirect/session) */}
       <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
         <p className="text-xs text-zinc-400">Last thread</p>
 
         {lastCenter?.nodeId ? (
+          <>
+            {/* Profile QR via API (SVG keeps it crisp) */}
+            {absoluteProfileUrl && (
+              <div className="mt-2 rounded-md border border-white/10 bg-black/30 p-2">
+                <img
+                  src={`/api/qr?text=${encodeURIComponent(absoluteProfileUrl)}&format=svg&size=220&margin=1`}
+                  alt="Scan to open node profile"
+                  className="rounded-md bg-white p-2"
+                  width={220}
+                  height={220}
+                />
+              </div>
+            )}
 
-           <>
-          <QRCodeImg
-      text={`/u/${encodeURIComponent(lastCenter.nodeId)}`}
-      size={180}
-      format="svg"           // or "png"
-      className="rounded-md bg-white p-2"
-      title="Scan to open node profile"
-    />
             <div className="mt-1">
               <span className="text-zinc-300">Node:</span>{" "}
               <span className="font-medium">{lastCenter.nodeId}</span>
@@ -166,30 +178,39 @@ function InnerPanel() {
             </div>
 
             <div className="mt-2 flex gap-2">
-  <button
-    className="rounded-lg bg-teal-400/10 px-3 py-1 ring-1 ring-teal-300/40 hover:bg-teal-400/15"
-    onClick={() => {
-      if (hasCoords) {
-        // Fly + pulse if we have coordinates
-        window.dispatchEvent(new CustomEvent("mesh:flyTo", { detail: { lat: lastCenter!.lat, lon: lastCenter!.lon, zoom: 6 } }));
-        window.dispatchEvent(new CustomEvent("mesh:pulseAt", { detail: { lat: lastCenter!.lat, lon: lastCenter!.lon } }));
-      } else {
-        window.dispatchEvent(new Event("mesh:refresh"));
-      }
-    }}
-  >
-    Locate my thread
-  </button>
+              <button
+                className="rounded-lg bg-teal-400/10 px-3 py-1 ring-1 ring-teal-300/40 hover:bg-teal-400/15"
+                onClick={() => {
+                  if (hasCoords) {
+                    window.dispatchEvent(
+                      new CustomEvent("mesh:flyTo", {
+                        detail: { lat: lastCenter!.lat, lon: lastCenter!.lon, zoom: 6 },
+                      })
+                    );
+                    window.dispatchEvent(
+                      new CustomEvent("mesh:pulseAt", {
+                        detail: { lat: lastCenter!.lat, lon: lastCenter!.lon },
+                      })
+                    );
+                  } else {
+                    refreshMap();
+                  }
+                }}
+              >
+                Locate my thread
+              </button>
 
-  <a
-    className="rounded-lg px-3 py-1 ring-1 ring-white/15 hover:bg-white/10"
-    href={`/u/${encodeURIComponent(lastCenter!.nodeId!)}`}
-  >
-    Open my profile →
-  </a>
-</div>
-
-
+              {absoluteProfileUrl && (
+                <a
+                  className="rounded-lg px-3 py-1 ring-1 ring-white/15 hover:bg-white/10"
+                  href={absoluteProfileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open my profile →
+                </a>
+              )}
+            </div>
           </>
         ) : (
           <p className="text-zinc-300">
@@ -197,7 +218,6 @@ function InnerPanel() {
           </p>
         )}
       </div>
-      
 
       {/* Recent activity list */}
       <div className="mt-4">
@@ -236,13 +256,19 @@ function InnerPanel() {
   );
 }
 
-
 export default function MeshPanel() {
   return (
-    <Suspense fallback={<div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">Loading…</div>}>
+    <Suspense
+      fallback={
+        <div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">
+          Loading…
+        </div>
+      }
+    >
       <InnerPanel />
     </Suspense>
   );
 }
+
 
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import QRCodeImg from "@/components/meshwork/QRCodeImg";
 
 async function getLast(nodeId: string) {
   try {
@@ -14,7 +15,13 @@ export default async function ProfilePage({ params }: { params: { nodeId: string
   const nodeId = decodeURIComponent(params.nodeId);
   const row = await getLast(nodeId);
   const profileUrl = `${process.env.NEXT_PUBLIC_BASE_URL || ""}/profile/${encodeURIComponent(nodeId)}`;
-
+<QRCodeImg
+  text={profileUrl}
+  size={256}
+  margin={1}
+  format="png"          // keep png for reliability on live
+  className="rounded-md ring-1 ring-white/10 bg-white/5 p-2"
+/>
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <div className="rounded-2xl border border-white/10 bg-[#0B0F14] p-6">
