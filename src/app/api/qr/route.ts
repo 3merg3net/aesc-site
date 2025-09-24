@@ -2,9 +2,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
+
+function hexToHashColor(hex: string, fallback: string) {
+  const m = String(hex || "").trim().match(/^#?([0-9a-f]{6}|[0-9a-f]{8})$/i);
+  return m ? `#${m[1]}` : fallback;
+}
 
 export async function GET(req: Request) {
   try {
@@ -18,13 +22,19 @@ export async function GET(req: Request) {
     const margin = Math.min(8, Math.max(0, Number(searchParams.get("margin") || "1")));
     const format = (searchParams.get("format") || "png").toLowerCase();
 
+    // NEW: optional colors + error correction
+    const fg = hexToHashColor(searchParams.get("fg") || "", "#0F172A");        // default dark slate
+    const bg = hexToHashColor(searchParams.get("bg") || "", "#00000000");      // transparent background
+    const ecParam = (searchParams.get("ec") || "M").toUpperCase();
+    const errorCorrectionLevel = (["L","M","Q","H"].includes(ecParam) ? ecParam : "M") as "L" | "M" | "Q" | "H";
+
     const common = {
       width: size,
       margin,
-      errorCorrectionLevel: "M" as const,
+      errorCorrectionLevel,
       color: {
-        dark: "#E6E6E6",     // light gray code
-        light: "#00000000",  // transparent background
+        dark: fg,
+        light: bg,
       },
     };
 
@@ -41,7 +51,6 @@ export async function GET(req: Request) {
 
     // default: PNG
     const buf = await QRCode.toBuffer(text, common);
-    // Convert Buffer -> Uint8Array so the Web Response typing is happy
     return new Response(new Uint8Array(buf), {
       status: 200,
       headers: {
@@ -53,5 +62,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, error: e?.message ?? "QR generation failed" }, { status: 500 });
   }
 }
+
 
 

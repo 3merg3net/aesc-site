@@ -112,6 +112,7 @@ export default function GettingStarted() {
           </div>
         </figure>
       </section>
+      
 
       {/* What’s next */}
       <section className="section">

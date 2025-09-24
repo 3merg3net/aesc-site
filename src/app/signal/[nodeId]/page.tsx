@@ -209,6 +209,31 @@ export default function SignalProfilePage() {
         </div>
       )}
 
+      {/* Actions under the QR */}
+<div className="grid grid-cols-3 gap-2">
+  ...
+  <a
+    href={
+      (() => {
+        const b = blocks?.[0];
+        const q = new URLSearchParams({
+          nodeId: nodeParam,
+          ...(Number.isFinite(b?.lat as number) ? { lat: String(b!.lat) } : {}),
+          ...(Number.isFinite(b?.lon as number) ? { lon: String(b!.lon) } : {}),
+          justPosted: "0",
+        });
+        return `/meshwork#map?${q.toString()}`;
+      })()
+    }
+    className="rounded border border-white/10 px-3 py-1 text-xs hover:bg-white/5 text-center"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Open on Map
+  </a>
+</div>
+
+
       {/* Signal Chain timeline */}
       <section id="signal-chain" className="mt-10 w-full max-w-xl">
         <div className="mb-3 flex items-center gap-2">
