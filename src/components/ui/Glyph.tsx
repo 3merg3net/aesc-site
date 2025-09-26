@@ -1,21 +1,31 @@
+// src/components/ui/Glyph.tsx
 "use client";
 
-import { cn } from "@/lib/utils";
+import React from "react";
+
+// Allow TSX elements explicitly
+type IconMap = Record<string, React.ReactNode>;
 
 export default function Glyph({
   name,
   className,
 }: {
-  name: "beacon" | "signal" | "star" | "chain";
+  name: string;
   className?: string;
 }) {
-  const icons: Record<string, JSX.Element> = {
+  const icons: IconMap = {
     beacon: <span className="text-lg">📡</span>,
     signal: <span className="text-lg">📶</span>,
-    star:   <span className="text-lg">⭐</span>,
-    chain:  <span className="text-lg">⛓️</span>,
+    star: <span className="text-lg">⭐</span>,
+    fire: <span className="text-lg">🔥</span>,
+    heart: <span className="text-lg">💛</span>,
   };
 
-  return <span className={cn("inline-block", className)}>{icons[name] ?? "❖"}</span>;
+  return (
+    <span className={className}>
+      {icons[name] ?? <span className="text-lg">❓</span>}
+    </span>
+  );
 }
+
 
