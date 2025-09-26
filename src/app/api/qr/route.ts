@@ -5,9 +5,12 @@ export const revalidate = 0;
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
 
-function hexToHashColor(hex: string, fallback: string) {
-  const m = String(hex || "").trim().match(/^#?([0-9a-f]{6}|[0-9a-f]{8})$/i);
-  return m ? `#${m[1]}` : fallback;
+// tiny in-PNG overlay helper (center the logo block)
+async function overlayPng(base: Buffer, logoPng?: Buffer): Promise<Buffer> {
+  if (!logoPng) return base;
+  // NOTE: keeping it simple and dependency-free:
+  // we return base for now; if you want compositing, we can add "sharp" later.
+  return base;
 }
 
 export async function GET(req: Request) {
@@ -18,24 +21,18 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: false, error: "Missing ?text" }, { status: 400 });
     }
 
-    const size = Math.min(1024, Math.max(64, Number(searchParams.get("size") || "256")));
-    const margin = Math.min(8, Math.max(0, Number(searchParams.get("margin") || "1")));
+    const size   = Math.min(1024, Math.max(64, Number(searchParams.get("size") || "256")));
+    const margin = Math.min(12,  Math.max(0,  Number(searchParams.get("margin") || "1")));
     const format = (searchParams.get("format") || "png").toLowerCase();
-
-    // NEW: optional colors + error correction
-    const fg = hexToHashColor(searchParams.get("fg") || "", "#0F172A");        // default dark slate
-    const bg = hexToHashColor(searchParams.get("bg") || "", "#00000000");      // transparent background
-    const ecParam = (searchParams.get("ec") || "M").toUpperCase();
-    const errorCorrectionLevel = (["L","M","Q","H"].includes(ecParam) ? ecParam : "M") as "L" | "M" | "Q" | "H";
+    // colors (hex without # is fine too)
+    const fg = "#" + (searchParams.get("fg") || "E6E6E6").replace(/^#/, "");
+    const bg = "#" + (searchParams.get("bg") || "00000000").replace(/^#/, ""); // default transparent
 
     const common = {
       width: size,
       margin,
-      errorCorrectionLevel,
-      color: {
-        dark: fg,
-        light: bg,
-      },
+      errorCorrectionLevel: "M" as const,
+      color: { dark: fg, light: bg },
     };
 
     if (format === "svg") {
@@ -51,7 +48,8 @@ export async function GET(req: Request) {
 
     // default: PNG
     const buf = await QRCode.toBuffer(text, common);
-    return new Response(new Uint8Array(buf), {
+    const out = await overlayPng(buf, undefined);
+    return new Response(new Uint8Array(out), {
       status: 200,
       headers: {
         "Content-Type": "image/png",
@@ -62,6 +60,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, error: e?.message ?? "QR generation failed" }, { status: 500 });
   }
 }
+
 
 
 

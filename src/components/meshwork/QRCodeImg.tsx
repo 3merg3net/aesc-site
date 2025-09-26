@@ -1,40 +1,30 @@
 "use client";
-
-type Props = {
-  text: string;
-  size?: number;      // default 256
-  margin?: number;    // default 1
-  format?: "png" | "svg"; // default "png"
-  className?: string;
-  title?: string;
-};
+import Image from "next/image";
 
 export default function QRCodeImg({
   text,
-  size = 256,
-  margin = 1,
-  format = "png", // safest for next/image pipelines
-  className,
-  title,
-}: Props) {
-  const qs = new URLSearchParams({
-    text: encodeURIComponent(text),
-    size: String(size),
-    margin: String(margin),
-    format,
-  }).toString();
-
-  // Use <img> to avoid next/image optimization pathway issues
+  size = 224,
+  className = "",
+  fg = "E6E6E6",        // module color (gold/gray)
+  bg = "00000000",      // transparent
+  format = "png",       // or "svg"
+  title = "QR",
+}: {
+  text: string;
+  size?: number;
+  className?: string;
+  fg?: string;
+  bg?: string;
+  format?: "png" | "svg";
+  title?: string;
+}) {
+  const src = `/api/qr?text=${encodeURIComponent(text)}&size=${size}&fg=${fg}&bg=${bg}&format=${format}`;
   return (
-    <img
-      src={`/api/qr?${qs}`}
-      alt={title || "QR code"}
-      className={className ?? "block"}
-      width={size}
-      height={size}
-      loading="lazy"
-      decoding="async"
-      style={{ imageRendering: "crisp-edges" }}
-    />
+    <div className={className} title={title}>
+      <div className="relative" style={{ width: size, height: size }}>
+        <Image src={src} alt={title} fill className="object-contain" />
+      </div>
+    </div>
   );
 }
+

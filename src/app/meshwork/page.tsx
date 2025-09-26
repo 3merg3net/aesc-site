@@ -3,93 +3,126 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import MeshworkHeader from "@/components/meshwork/MeshworkHeader";
+import SectionHeader from "@/components/meshwork/SectionHeader";
 import StatsBar from "@/components/meshwork/StatsBar";
 import RecentTicker from "@/components/meshwork/RecentTicker";
-// ⬇️ CHANGE: use the client-wrapped map
 import LiveMapClient from "@/components/meshwork/LiveMapClient";
-import MeshPanel from "@/components/meshwork/MeshPanel";
-import { Suspense } from "react";
 import MeshPanelIsland from "@/components/meshwork/MeshPanelIsland";
-
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "ÆSC Meshwork — Build on the Phramework",
+  title: "ÆSC Meshwork — Own Your Signal Chain",
   description:
-    "Open contracts, event channels, and SDKs for building verses on the invariant Meshwork stewarded by ÆSC Trust.",
+    "Start a Signal (Genesis), post signed presence, and build on the invariant Meshwork stewarded by ÆSC Trust.",
 };
+
+// Local helper: consistent framing for wide vs tall infographics
+function FigureImg({
+  src,
+  alt,
+  variant = "wide", // "wide" | "tall"
+}: {
+  src: string;
+  alt: string;
+  variant?: "wide" | "tall";
+}) {
+  const wrap =
+    variant === "tall"
+      ? "mx-auto w-full max-w-3xl" // narrower frame for tall images
+      : "mx-auto w-full max-w-6xl"; // roomy frame for wide images
+
+  const box =
+    variant === "tall"
+      ? "relative h-[460px] md:h-[560px] overflow-hidden rounded-xl"
+      : "relative aspect-[16/6] overflow-hidden rounded-xl";
+
+  return (
+    <figure className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-3">
+      <div className={wrap}>
+        <div className={box}>
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="(max-width: 768px) 100vw, 1600px"
+            className="object-contain"
+          />
+        </div>
+      </div>
+    </figure>
+  );
+}
 
 export default function MeshworkPage() {
   return (
     <main className="min-h-screen bg-[#0B0F14] text-zinc-100">
+      {/* Hero banner wrapper (object-contain) */}
       <MeshworkHeader />
 
-      {/* HERO */}
-      <header className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
-          <p className="text-[11px] tracking-[0.18em] text-teal-300/80">FOUNDATION • DEVELOPERS</p>
+      {/* HERO COPY + CTA STRIP */}
+      <header className="border-b border-white/10 bg-gradient-to-b from-black/20 to-transparent">
+        <div className="mx-auto max-w-7xl px-6 pb-10 md:pb-12">
+          <p className="text-[11px] tracking-[0.18em] text-teal-300/80">
+            FOUNDATION • SIGNAL • DEVELOPERS
+          </p>
           <h1 className="mt-2 text-3xl md:text-5xl font-semibold tracking-tight">
-            The ÆSC <span className="text-teal-300">Meshwork</span>
+            Build the <span className="text-teal-300">Meshwork</span> by owning your{" "}
+            <span className="text-yellow-300">Signal Chain</span>
           </h1>
-          <p className="mt-4 max-w-2xl text-sm md:text-base text-zinc-300">
-            The Meshwork is a living network of digital nodes. Each <strong>thread</strong> you post
-            proves presence and activity in time. As more threads interweave, the fabric becomes a
-            verifiable substrate that apps, communities, and verses can build upon—transparent by
-            design and aligned with Æ invariants.
+
+          <p className="mt-4 max-w-3xl text-sm md:text-base text-zinc-300">
+            A <strong>Signal</strong> is a signed statement of presence. Your first Signal becomes{" "}
+            <strong>Genesis</strong>—the start of a personal, tamper-resistant{" "}
+            <strong>Signal Chain (SC)</strong>. As Signals accumulate, your node strengthens the
+            Meshwork: an open fabric for coordination, reputation, and verifiable activity.
           </p>
 
-          <nav className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-400">
-            {[
-              { id: "quickstart", label: "Quickstart" },
-              { id: "map", label: "Live Map" },
-              { id: "contracts", label: "Contracts" },
-              { id: "api", label: "APIs & Events" },
-              { id: "sdks", label: "SDKs" },
-              { id: "archetypes", label: "Archetypes" },
-              { id: "examples", label: "Examples" },
-            ].map((s) => (
-              <a
-                key={s.id}
-                href={`#${s.id}`}
-                className="hover:text-zinc-200 underline-offset-4 hover:underline"
-              >
-                {s.label}
-              </a>
-            ))}
-          </nav>
+          <div className="mt-6 flex flex-wrap gap-3 text-sm">
+            <Link
+              href="/meshwork/getting-started"
+              className="rounded-xl border border-teal-300/40 bg-teal-300/10 px-4 py-2 hover:bg-teal-300/15"
+            >
+              Create Your Signal (Genesis)
+            </Link>
+            <a href="#map" className="rounded-xl border border-white/10 px-4 py-2 hover:bg-white/5">
+              View Live Map
+            </a>
+            <a href="#mechanics" className="rounded-xl border border-white/10 px-4 py-2 hover:bg-white/5">
+              How Signals Work
+            </a>
+          </div>
         </div>
       </header>
 
       {/* QUICKSTART */}
       <section id="quickstart" className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl md:text-2xl font-semibold">Quickstart (3 steps)</h2>
-            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-              <Image
-                src="/meshwork/divider-quickstart.svg"
-                alt="Quickstart divider"
-                fill
-                className="object-contain opacity-80"
-              />
-            </div>
-          </div>
-
+        <div className="mx-auto max-w-7xl px-6 py-12 md:py-14">
+          <SectionHeader
+            title="Quickstart (3 steps)"
+            divider="/assets/meshwork/divider-quickstart.png"
+          />
           <p className="mt-3 max-w-3xl text-sm text-zinc-400">
-            Spin up a node in minutes. Every participant strengthens the Meshwork by posting
-            lightweight, signed <strong>threads</strong>. Follow the steps to join and watch your
-            node appear on the live map.
+            1) Choose a <strong>Node ID</strong>. 2) Post a signed <strong>Genesis</strong>. 3) Land on
+            your Signal Profile with a QR to share. Your node will appear on the Live Map (respecting your
+            privacy mode).
           </p>
 
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="relative aspect-[16/7] overflow-hidden rounded-xl">
-              <Image
-                src="/meshwork/infographic-getting-started1.png"
-                alt="Getting started overview: Node → Thread → Map"
-                fill
-                sizes="(max-width: 768px) 100vw, 1600px"
-                className="object-contain"
-              />
-            </div>
+          <FigureImg
+            variant="wide"
+            src="/assets/meshwork/infographic-signal-quickstart.png"
+            alt="Quickstart overview: Node → Genesis → Profile + Map"
+          />
+
+          <div className="mt-6 flex flex-wrap gap-3 text-sm">
+            <Link
+              href="/meshwork/getting-started"
+              className="rounded-xl border border-teal-300/40 bg-teal-300/10 px-4 py-2 hover:bg-teal-300/15"
+            >
+              Start Wizard
+            </Link>
+            <Link href="/api/nodes" className="rounded-xl border border-white/10 px-4 py-2 hover:bg-white/5">
+              View JSON
+            </Link>
           </div>
         </div>
       </section>
@@ -97,129 +130,117 @@ export default function MeshworkPage() {
       <RecentTicker />
       <StatsBar />
 
-      {/* Map section */}
-<section id="map" className="border-b border-white/10 relative">
-  <div className="mx-auto max-w-7xl px-0 py-12 md:py-16">
-    <h2 className="px-6 text-xl md:text-2xl font-semibold">Live Meshwork Map</h2>
-    <p className="mt-3 px-6 max-w-2xl text-sm text-zinc-400">
-      Each glowing point is a node posting verified threads—proof of presence across the globe.
-    </p>
+      {/* MAP */}
+      <section id="map" className="border-b border-white/10 relative">
+        <div className="mx-auto max-w-7xl px-0 py-12 md:py-16">
+          {/* Keeping simple H2 here to avoid needing a divider-map asset */}
+          <h2 className="px-6 text-xl md:text-2xl font-semibold">Live Meshwork Map</h2>
+          <p className="mt-3 px-6 max-w-2xl text-sm text-zinc-400">
+            Each glowing point is a node with recent Signals—verifiable presence across the globe.
+          </p>
 
-    <div className="relative mt-6">
-      <LiveMapClient fullBleed heightClass="h-[70vh]" />
-
-      {/* Overlay panel at bottom-left */}
-      <div className="pointer-events-none absolute left-4 bottom-4 z-[401]">
-        <div className="pointer-events-auto">
-          {/* import MeshPanel at top: import MeshPanel from "@/components/meshwork/MeshPanel"; */}
-          <MeshPanelIsland />
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-
-      {/* CONTRACTS */}
-      <section id="contracts" className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl md:text-2xl font-semibold">Contracts (Base L2)</h2>
-            <div className="relative h-[60px] w-full max-w-4xl">
-              <Image
-                src="/meshwork/divider-contracts.svg"
-                alt="Contracts divider"
-                fill
-                className="object-cover opacity-80"
-              />
+          <div className="relative mt-6">
+            <LiveMapClient fullBleed heightClass="h-[70vh]" />
+            {/* Overlay panel */}
+            <div className="pointer-events-none absolute left-4 bottom-4 z-[401]">
+              <div className="pointer-events-auto">
+                <Suspense fallback={null}>
+                  <MeshPanelIsland />
+                </Suspense>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <p className="mt-3 max-w-3xl text-sm text-zinc-300">
-            On-chain contracts anchor Meshwork to <strong>Base L2</strong>, giving nodes durable
-            identity and emitting events any app can index. We keep surface area small and policy-free,
-            favoring composability with off-chain systems.
-          </p>
+      {/* MECHANICS / WHY */}
+      <section id="mechanics" className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-6 py-12 md:py-14">
+          <SectionHeader
+            title="How Signals Work"
+            divider="/assets/meshwork/divider-mechanics.png"
+          />
 
           <div className="mt-6 grid gap-6 md:grid-cols-[1fr,380px]">
             <div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <article className="rounded-2xl border border-white/10 p-5">
-                  <h3 className="font-medium">NodeRegistry</h3>
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Canonical mapping of <code className="rounded bg-white/5 px-1">nodeId</code> → metadata.
-                    Emits buildable events for indexing and analytics.
-                  </p>
-                  <ul className="mt-3 list-disc pl-5 text-sm text-zinc-400">
-                    <li>Events: <code className="rounded bg-white/5 px-1">NodeRegistered</code>, <code className="rounded bg-white/5 px-1">NodeUpdated</code></li>
-                    <li>Optional geo hash, display name, URL</li>
-                    <li>Optimistic updates; hardening via attestations</li>
-                  </ul>
-                </article>
-
-                <article className="rounded-2xl border border-white/10 p-5">
-                  <h3 className="font-medium">AnchorNode (optional)</h3>
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Extension for special sites (sacred, civic, institutional). Encodes location, epoch,
-                    sigil, and witness attestations.
-                  </p>
-                  <ul className="mt-3 list-disc pl-5 text-sm text-zinc-400">
-                    <li>Events: <code className="rounded bg-white/5 px-1">PlacementAttested</code>, <code className="rounded bg-white/5 px-1">AnchorLinked</code></li>
-                    <li>Supports off-chain proofs + on-chain references</li>
-                  </ul>
-                </article>
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-white/10 bg-black/40 p-5">
-                <h4 className="text-sm font-semibold">Design principles</h4>
-                <ul className="mt-2 grid gap-2 text-sm text-zinc-300 md:grid-cols-3">
-                  <li>Minimal surface area</li>
-                  <li>Event-first (easy to index)</li>
-                  <li>Composable with off-chain systems</li>
-                  <li>Base-first, chain-agnostic patterns</li>
-                  <li>Separation of identity vs. activity</li>
-                  <li>Clear upgrade path via proxies</li>
+              <article className="rounded-2xl border border-white/10 p-5 bg-black/30">
+                <h3 className="font-medium">Signal = Signed Presence</h3>
+                <p className="mt-2 text-sm text-zinc-300">
+                  A Signal contains your <code className="rounded bg-white/5 px-1">nodeId</code>, a timestamp, and a random
+                  nonce—signed via HMAC-SHA256 using your secret. The network verifies freshness and signature before
+                  updating public state.
+                </p>
+                <ul className="mt-3 list-disc pl-5 text-sm text-zinc-400">
+                  <li>Base string: <code className="rounded bg-white/5 px-1">nodeId|stickerId|ts|nonce</code></li>
+                  <li>Attach optional lat/lon; privacy modes: zone / global / hidden</li>
+                  <li>Your first Signal is <strong>Genesis</strong>, the start of your <strong>Signal Chain</strong></li>
                 </ul>
-              </div>
+              </article>
+
+              <article className="mt-4 rounded-2xl border border-white/10 p-5 bg-black/30">
+                <h3 className="font-medium">Own Your Signal Chain (SC)</h3>
+                <p className="mt-2 text-sm text-zinc-300">
+                  The SC is your personal, append-only ledger within the Meshwork. You control what’s posted, how it’s
+                  shared, and what apps can build on top—profiles, audits, rewards, and rituals all grow from your
+                  verified activity.
+                </p>
+                <ul className="mt-3 list-disc pl-5 text-sm text-zinc-400">
+                  <li>Portable identity: share your Signal Profile via QR</li>
+                  <li>Export SC as JSON for analysis &amp; backup</li>
+                  <li>Composability with WEave and AEverse (roadmap)</li>
+                </ul>
+              </article>
             </div>
 
             <aside className="rounded-2xl border border-white/10 bg-white/5 p-3">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
                 <Image
-                  src="/meshwork/infographic-contracts.svg"
-                  alt="Contract event flow"
+                  src="/assets/meshwork/infographic-signal-lifecycle.png"
+                  alt="Signal lifecycle"
                   fill
                   sizes="(max-width: 768px) 100vw, 1600px"
                   className="object-contain"
                 />
               </div>
               <p className="mt-2 text-xs text-zinc-400">
-                Node registration emits events that indexers, dashboards, and auditors can subscribe to.
+                Lifecycle: Node → Sign → Verify → Public state → Map &amp; Profile.
               </p>
             </aside>
           </div>
         </div>
       </section>
 
+      {/* CONTRACTS */}
+      <section id="contracts" className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-6 py-12 md:py-14">
+          <SectionHeader
+            title="Contracts (Base L2)"
+            divider="/assets/meshwork/divider-contracts.png"
+          />
+          <p className="mt-3 max-w-3xl text-sm text-zinc-300">
+            On-chain contracts anchor identity and emit events indexers can subscribe to. We favor a minimal, composable
+            surface that pairs cleanly with off-chain systems.
+          </p>
+
+          <FigureImg
+            variant="wide"
+            src="/assets/meshwork/infographic-contracts.png"
+            alt="Contract event flow"
+          />
+        </div>
+      </section>
+
       {/* APIs & EVENTS */}
       <section id="api" className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl md:text-2xl font-semibold">APIs &amp; Event Channels</h2>
-            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-              <Image
-                src="/meshwork/divider-apis.svg"
-                alt="APIs divider"
-                fill
-                className="object-cover opacity-80"
-              />
-            </div>
-          </div>
+        <div className="mx-auto max-w-7xl px-6 py-12 md:py-14">
+          <SectionHeader
+            title="APIs & Event Channels"
+            divider="/assets/meshwork/divider-apis-and-events.png"
+          />
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
-            Use REST for simple reads and writes, or subscribe to event streams for real-time workflows.
-            WebSockets are on the roadmap to reduce polling and enable fully live apps.
+            Use REST to read/write or subscribe to event streams for real-time workflows. WebSockets (roadmap) will
+            enable live subscriptions without polling.
           </p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -227,7 +248,7 @@ export default function MeshworkPage() {
               <h3 className="font-medium">REST</h3>
               <ul className="mt-3 space-y-2 text-sm text-zinc-300">
                 <li><code className="rounded bg-white/5 px-1">GET /api/nodes</code> — latest presence per node</li>
-                <li><code className="rounded bg-white/5 px-1">POST /api/mesh/ping</code> — post a signed thread</li>
+                <li><code className="rounded bg-white/5 px-1">POST /api/mesh/ping</code> — post a signed Signal</li>
               </ul>
               <pre className="mt-3 overflow-x-auto rounded-lg bg-black/50 p-3 text-xs text-zinc-200">
 {`curl https://aesctrust.org/api/nodes`}
@@ -247,39 +268,26 @@ export default function MeshworkPage() {
             <div className="rounded-2xl border border-white/10 p-5">
               <h3 className="font-medium">WebSocket (roadmap)</h3>
               <p className="mt-2 text-sm text-zinc-300">
-                Live subscriptions without polling. Topic filtering, backpressure, resumable cursors.
+                Live topic subscriptions with backpressure and resumable cursors.
               </p>
             </div>
           </div>
 
-          <figure className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="relative aspect-[16/7] overflow-hidden rounded-xl">
-              <Image
-                src="/meshwork/infographic-apis.svg"
-                alt="API and channel topology"
-                fill
-                sizes="(max-width: 768px) 100vw, 1600px"
-                className="object-contain"
-              />
-            </div>
-          </figure>
+          <FigureImg
+            variant="wide"
+            src="/assets/meshwork/infographic-apis.png"
+            alt="API and channel topology"
+          />
         </div>
       </section>
 
       {/* SDKS */}
       <section id="sdks" className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl md:text-2xl font-semibold">SDKs</h2>
-            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-              <Image
-                src="/meshwork/divider-sdks.svg"
-                alt="SDKs divider"
-                fill
-                className="object-cover opacity-80"
-              />
-            </div>
-          </div>
+        <div className="mx-auto max-w-7xl px-6 py-12 md:py-14">
+          <SectionHeader
+            title="SDKs"
+            divider="/assets/meshwork/divider-sdks.png"
+          />
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
             SDKs make Meshwork integration straightforward. Use <strong>TypeScript</strong> for apps and dashboards,
@@ -317,108 +325,84 @@ mesh.ping(**msg, sig=sig, lat=37.78, lon=-122.41)`}
             </article>
           </div>
 
-          <figure className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="relative aspect-[16/7] overflow-hidden rounded-xl">
-              <Image
-                src="/meshwork/infographic-sdks.svg"
-                alt="SDK overview"
-                fill
-                sizes="(max-width: 768px) 100vw, 1600px"
-                className="object-contain"
-              />
-            </div>
-          </figure>
+          {/* Keeping your existing filename here intentionally */}
+          <FigureImg
+            variant="wide"
+            src="/assets/meshwork/infographic-apis.png"
+            alt="SDK overview"
+          />
         </div>
       </section>
 
       {/* ARCHETYPES */}
       <section id="archetypes" className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl md:text-2xl font-semibold">Archetypes</h2>
-            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-              <Image
-                src="/meshwork/divider-archetypes.svg"
-                alt="Archetypes divider"
-                fill
-                className="object-cover opacity-80"
-              />
-            </div>
-          </div>
+        <div className="mx-auto max-w-7xl px-6 py-12 md:py-14">
+          <SectionHeader
+            title="Archetypes"
+            divider="/assets/meshwork/divider-archetypes.png"
+          />
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
             Archetypes give symbolic shape to Meshwork design. Each maps to a practical concern in systems
             engineering and governance, helping teams reason about roles and responsibilities.
           </p>
 
-          <figure className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="relative aspect-[16/7] overflow-hidden rounded-xl">
-              <Image
-                src="/meshwork/infographic-archetypes.svg"
-                alt="Archetype map"
-                fill
-                sizes="(max-width: 768px) 100vw, 1600px"
-                className="object-contain"
-              />
-            </div>
-            <figcaption className="pt-2 text-xs text-zinc-400">
-              Elements as a shared mental model for architecture and coordination.
-            </figcaption>
-          </figure>
+          {/* Keeping your existing filename here intentionally */}
+          <FigureImg
+            variant="wide"
+            src="/assets/meshwork/infographic-signal-lifecycle.png"
+            alt="Archetype map"
+          />
+
+          <figcaption className="px-1 pt-2 text-xs text-zinc-400">
+            Elements as a shared mental model for architecture and coordination.
+          </figcaption>
         </div>
       </section>
 
       {/* EXAMPLES */}
       <section id="examples" className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl md:text-2xl font-semibold">Examples</h2>
-            <div className="relative h-[60px] w-full max-w-4xl hidden md:block">
-              <Image
-                src="/meshwork/divider-examples.svg"
-                alt="Examples divider"
-                fill
-                className="object-cover opacity-80"
-              />
-            </div>
-          </div>
+        <div className="mx-auto max-w-7xl px-6 py-12 md:py-14">
+          <SectionHeader
+            title="Examples"
+            divider="/assets/meshwork/divider-examples.png"
+          />
 
           <p className="mt-3 max-w-3xl text-sm text-zinc-300">
-            A few starting points that demonstrate how teams can build with Meshwork—from live presence
-            maps to temporal rituals and budget pilots aligned to cosmic cycles.
+            From live presence maps to rituals and audits—Signals are the primitive that powers
+            coordination. Here are a few directions to build.
           </p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             <article className="rounded-2xl border border-white/10 p-5">
               <div className="relative mb-3 aspect-[16/9] overflow-hidden rounded-xl">
-                <Image src="/meshwork/example-live-map.png" alt="Live map example" fill className="object-cover" />
+                <Image src="/assets/meshwork/example-live-map.png" alt="Live map example" fill className="object-contain" />
               </div>
               <h3 className="font-medium">Live Node Map</h3>
               <p className="mt-2 text-sm text-zinc-300">
                 Subscribe to <code className="rounded bg-white/5 px-1">mesh.ping</code> and light up
-                live placements for your product or community hub.
+                verified presence for your product or community hub.
               </p>
             </article>
 
             <article className="rounded-2xl border border-white/10 p-5">
               <div className="relative mb-3 aspect-[16/9] overflow-hidden rounded-xl">
-                <Image src="/meshwork/example-ritual.png" alt="Generative ritual example" fill className="object-cover" />
+                <Image src="/assets/meshwork/example-ritual.png" alt="Generative ritual example" fill className="object-contain" />
               </div>
               <h3 className="font-medium">Generative Ritual</h3>
               <p className="mt-2 text-sm text-zinc-300">
-                Translate resonance windows into sound/visuals; mint badges when coordinated
-                activity surpasses thresholds.
+                Translate resonance windows into sound/visuals; mint badges when synchronized activity
+                surpasses thresholds.
               </p>
             </article>
 
             <article className="rounded-2xl border border-white/10 p-5">
               <div className="relative mb-3 aspect-[16/9] overflow-hidden rounded-xl">
-                <Image src="/meshwork/example-c96.png" alt="C96 budget pilot" fill className="object-cover" />
+                <Image src="/assets/meshwork/example-c96.png" alt="C96 budget pilot" fill className="object-contain" />
               </div>
               <h3 className="font-medium">C96 Budget Pilot</h3>
               <p className="mt-2 text-sm text-zinc-300">
-                Periodic budgets that reconcile on a C96 cadence with verifiable threads and
-                attestations for accountability.
+                Periodic budgets reconcile on a C96 cadence with verifiable Signals and attestations.
               </p>
             </article>
           </div>
@@ -436,6 +420,10 @@ mesh.ping(**msg, sig=sig, lat=37.78, lon=-122.41)`}
     </main>
   );
 }
+
+
+
+
 
 
 

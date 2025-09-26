@@ -1,3 +1,4 @@
+// src/components/layout/Header.tsx
 "use client";
 
 import Link from "next/link";
@@ -25,7 +26,10 @@ export default function Header() {
   const meshRef = useRef<HTMLDivElement | null>(null);
 
   // Close menus on route change
-  useEffect(() => { setMobileOpen(false); setMeshOpen(false); }, [pathname]);
+  useEffect(() => {
+    setMobileOpen(false);
+    setMeshOpen(false);
+  }, [pathname]);
 
   // Close mesh menu on outside click / esc
   useEffect(() => {
@@ -73,7 +77,7 @@ export default function Header() {
           <NavLink href="/governance" active={isActive("/governance")}>Governance</NavLink>
           <NavLink href="/ecosystem" active={isActive("/ecosystem")}>Ecosystem</NavLink>
 
-          {/* Meshwork: CLICK to toggle, panel only renders when open */}
+          {/* Meshwork: dropdown trimmed to Meshwork + Getting Started */}
           <div className="relative" ref={meshRef}>
             <button
               type="button"
@@ -96,45 +100,42 @@ export default function Header() {
             {meshOpen && (
               <div
                 role="menu"
-                className="absolute left-1/2 -translate-x-1/2 mt-3 w-[280px]
-                           rounded-2xl border border-white/10 bg-black/70 backdrop-blur p-3 z-50 shadow-xl"
+                className="absolute left-1/2 -translate-x-1/2 mt-3 w-[260px]
+                           rounded-2xl border border-white/10 bg-black/70 backdrop-blur p-2 z-50 shadow-xl"
               >
+                {/* Overview */}
                 <Link
                   href="/meshwork"
                   role="menuitem"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-white/5 focus:bg-white/5 focus:outline-none"
                   onClick={() => setMeshOpen(false)}
                 >
-                  <Image src="/meshwork/logo-meshwork.png" alt="" width={24} height={24} className="opacity-90" />
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10">
+                    <svg width="14" height="14" viewBox="0 0 24 24" className="opacity-80">
+                      <path d="M3 12h18M12 3v18" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                  </span>
                   <div>
-                    <div className="text-sm font-medium">Overview</div>
-                    <div className="text-xs text-zinc-400">Nodes, pings, resonance</div>
+                    <div className="text-sm font-medium">Meshwork</div>
+                    <div className="text-xs text-zinc-400">Overview & mechanics</div>
                   </div>
                 </Link>
 
+                {/* Getting Started */}
                 <Link
                   href="/meshwork/getting-started"
                   role="menuitem"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-white/5 focus:bg-white/5 focus:outline-none"
+                  className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-white/5 focus:bg-white/5 focus:outline-none"
                   onClick={() => setMeshOpen(false)}
                 >
-                  <Image src="/meshwork/btn-get-started.png" alt="" width={90} height={24} className="opacity-90" />
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10">
+                    <svg width="14" height="14" viewBox="0 0 24 24" className="opacity-80">
+                      <path d="M5 12h14M12 5v14" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                  </span>
                   <div>
                     <div className="text-sm font-medium">Getting Started</div>
-                    <div className="text-xs text-zinc-400">3-step quickstart</div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/meshwork#map"
-                  role="menuitem"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-white/5 focus:bg-white/5 focus:outline-none"
-                  onClick={() => setMeshOpen(false)}
-                >
-                  <Image src="/meshwork/btn-view-map.png" alt="" width={84} height={24} className="opacity-90" />
-                  <div>
-                    <div className="text-sm font-medium">Live Map</div>
-                    <div className="text-xs text-zinc-400">Real-time nodes</div>
+                    <div className="text-xs text-zinc-400">3-step Signal wizard</div>
                   </div>
                 </Link>
               </div>
@@ -260,6 +261,7 @@ function SocialLink({
     </Link>
   );
 }
+
 
 
 

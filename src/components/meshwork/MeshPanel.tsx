@@ -1,7 +1,8 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-// NOTE: Intentionally no useSearchParams to avoid CSR bailouts.
+import Image from "next/image";
+import Badge from "@/components/ui/Badge";
 
 type NodeRow = { node_id: string; last_seen: number; lat: number; lon: number };
 type Last = { nodeId?: string; lat?: number; lon?: number; ts?: number };
@@ -22,9 +23,11 @@ function InnerPanel() {
   const [recent, setRecent] = useState<NodeRow[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(false);
   const [loadingLast, setLoadingLast] = useState(false);
-  const [profileLink, setProfileLink] = useState<string | null>(null); // absolute URL for QR
 
-  // Map helpers
+  const hasCoords =
+    Number.isFinite(lastCenter?.lat as number) && Number.isFinite(lastCenter?.lon as number);
+
+  // helper -> talk to LiveMap
   const flyTo = (lat?: number, lon?: number, zoom = 6) => {
     if (lat == null || lon == null) return;
     window.dispatchEvent(new CustomEvent("mesh:flyTo", { detail: { lat, lon, zoom } }));
@@ -40,14 +43,6 @@ function InnerPanel() {
     try {
       const raw = sessionStorage.getItem("lastThreadCenter");
       if (raw) setLastCenter(JSON.parse(raw));
-    } catch {}
-    try {
-      const rawP = sessionStorage.getItem("mesh:lastProfile"); // may be a relative path
-      if (rawP && typeof window !== "undefined") {
-        const origin = window.location.origin;
-        const absolute = rawP.startsWith("http") ? rawP : `${origin}${rawP}`;
-        setProfileLink(absolute);
-      }
     } catch {}
   }, []);
 
@@ -73,7 +68,7 @@ function InnerPanel() {
     loadRecent();
   }, []);
 
-  // Load last DB-confirmed row for focused node (if any)
+  // Load last row details for the focused node (if we have one)
   useEffect(() => {
     const node = lastCenter?.nodeId || "";
     if (!node) {
@@ -103,39 +98,19 @@ function InnerPanel() {
     };
   }, [lastCenter?.nodeId]);
 
-  const hasCoords =
-    Number.isFinite(lastCenter?.lat as number) && Number.isFinite(lastCenter?.lon as number);
-
-  // Build an absolute profile URL for QR if we have a nodeId
-  const absoluteProfileUrl =
-    typeof window !== "undefined" && lastCenter?.nodeId
-      ? `${window.location.origin}/u/${encodeURIComponent(lastCenter.nodeId)}`
-      : profileLink || null;
-
   return (
     <div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">
-      <h3 className="font-semibold text-white/90">Mesh Panel</h3>
+      <h3 className="font-semibold text-white/90 flex items-center gap-2">
+        Mesh Panel <Badge variant="gold">Conservator</Badge>
+      </h3>
 
-      {/* Last thread (from redirect/session) */}
+      {/* Last signal (from redirect/session) */}
       <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
-        <p className="text-xs text-zinc-400">Last thread</p>
+        <p className="text-xs text-zinc-400">Last signal</p>
 
         {lastCenter?.nodeId ? (
           <>
-            {/* Profile QR via API (SVG keeps it crisp) */}
-            {absoluteProfileUrl && (
-              <div className="mt-2 rounded-md border border-white/10 bg-black/30 p-2">
-                <img
-                  src={`/api/qr?text=${encodeURIComponent(absoluteProfileUrl)}&format=svg&size=220&margin=1`}
-                  alt="Scan to open node profile"
-                  className="rounded-md bg-white p-2"
-                  width={220}
-                  height={220}
-                />
-              </div>
-            )}
-
-            <div className="mt-1">
+            <div className="mt-2">
               <span className="text-zinc-300">Node:</span>{" "}
               <span className="font-medium">{lastCenter.nodeId}</span>
             </div>
@@ -143,9 +118,7 @@ function InnerPanel() {
             {hasCoords ? (
               <div className="mt-1">
                 <span className="text-zinc-300">Loc:</span>{" "}
-                <span>
-                  {lastCenter.lat!.toFixed(3)}, {lastCenter.lon!.toFixed(3)}
-                </span>
+                <span>{lastCenter.lat!.toFixed(3)}, {lastCenter.lon!.toFixed(3)}</span>
               </div>
             ) : (
               <p className="mt-1 text-zinc-400">No coordinates were included.</p>
@@ -173,7 +146,7 @@ function InnerPanel() {
                 </div>
               )}
               {!loadingLast && !lastRow && (
-                <div className="opacity-70">No row found yet for this node.</div>
+                <div className="opacity-70">No record found yet for this node.</div>
               )}
             </div>
 
@@ -182,39 +155,27 @@ function InnerPanel() {
                 className="rounded-lg bg-teal-400/10 px-3 py-1 ring-1 ring-teal-300/40 hover:bg-teal-400/15"
                 onClick={() => {
                   if (hasCoords) {
-                    window.dispatchEvent(
-                      new CustomEvent("mesh:flyTo", {
-                        detail: { lat: lastCenter!.lat, lon: lastCenter!.lon, zoom: 6 },
-                      })
-                    );
-                    window.dispatchEvent(
-                      new CustomEvent("mesh:pulseAt", {
-                        detail: { lat: lastCenter!.lat, lon: lastCenter!.lon },
-                      })
-                    );
+                    window.dispatchEvent(new CustomEvent("mesh:flyTo", { detail: { lat: lastCenter!.lat, lon: lastCenter!.lon, zoom: 6 } }));
+                    window.dispatchEvent(new CustomEvent("mesh:pulseAt", { detail: { lat: lastCenter!.lat, lon: lastCenter!.lon } }));
                   } else {
                     refreshMap();
                   }
                 }}
               >
-                Locate my thread
+                Locate my signal
               </button>
 
-              {absoluteProfileUrl && (
-                <a
-                  className="rounded-lg px-3 py-1 ring-1 ring-white/15 hover:bg-white/10"
-                  href={absoluteProfileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open my profile →
-                </a>
-              )}
+              <a
+                className="rounded-lg px-3 py-1 ring-1 ring-white/15 hover:bg-white/10"
+                href={`/signal/${encodeURIComponent(lastCenter!.nodeId!)}`}
+              >
+                Open my profile →
+              </a>
             </div>
           </>
         ) : (
           <p className="text-zinc-300">
-            Post a thread in <span className="underline">Getting Started</span> to see it here.
+            Post a Signal in <span className="underline">Getting Started</span> to see it here.
           </p>
         )}
       </div>
@@ -249,8 +210,15 @@ function InnerPanel() {
               </span>
             </li>
           ))}
-          {recent.length === 0 && <li className="text-xs text-zinc-400">No recent nodes yet.</li>}
+          {recent.length === 0 && <li className="text-xs text-zinc-400">No recent signals yet.</li>}
         </ul>
+
+        <div className="mt-3 text-[11px] text-zinc-400">
+          Keep the mesh alive —
+          <span className="mx-1"><Badge variant="teal">Conservator</Badge></span>
+          post regular Signals.
+          <a className="ml-2 underline hover:text-zinc-200" href="/meshwork/getting-started">Start now →</a>
+        </div>
       </div>
     </div>
   );
@@ -258,17 +226,14 @@ function InnerPanel() {
 
 export default function MeshPanel() {
   return (
-    <Suspense
-      fallback={
-        <div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">
-          Loading…
-        </div>
-      }
-    >
+    <Suspense fallback={
+      <div className="pointer-events-auto w-[320px] rounded-2xl border border-white/10 bg-black/60 p-4 text-sm text-zinc-200 backdrop-blur">Loading…</div>
+    }>
       <InnerPanel />
     </Suspense>
   );
 }
+
 
 
 

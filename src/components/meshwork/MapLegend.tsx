@@ -1,18 +1,9 @@
 export default function MapLegend() {
-  const Item = ({ c, label }: { c: string; label: string }) => (
-    <div className="flex items-center gap-2">
-      <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: c }} />
-      <span className="text-xs text-slate-300">{label}</span>
-    </div>
-  );
   return (
-    <div className="pointer-events-none absolute right-3 bottom-3 z-[500] rounded-lg bg-black/50 px-3 py-2 ring-1 ring-white/10">
-      <div className="text-[11px] uppercase tracking-wide text-slate-400 mb-1">Legend</div>
-      <div className="flex flex-col gap-1">
-        <Item c="#22d3ee" label="< 10m" />
-        <Item c="#f59e0b" label="< 60m" />
-        <Item c="#64748b" label="older" />
-      </div>
+    <div className="pointer-events-auto rounded-xl border border-white/10 bg-black/60 p-2 text-xs text-zinc-300 backdrop-blur">
+      <div><span className="inline-block h-2 w-2 rounded-full bg-cyan-300/80 align-middle mr-2" />Node</div>
+      <div className="mt-1 text-zinc-400">Glow size = recent Signal activity (validator strength)</div>
     </div>
   );
 }
+
